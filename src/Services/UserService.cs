@@ -1,0 +1,289 @@
+using api_slim.src.Handlers;
+using api_slim.src.Interfaces.User;
+using api_slim.src.Models;
+using api_slim.src.Models.Base;
+using api_slim.src.Shared.DTOs;
+using api_slim.src.Shared.DTOs.User;
+using api_slim.src.Shared.Utils;
+using api_slim.src.Shared.Validators;
+
+namespace api_slim.src.Services
+{
+    public class UserService(IUserRepository userRepository, SmsHandler smsHandler, MailHandler mailHandler, CloudinaryHandler cloudinaryHandler) : IUserService
+    {
+        #region CREATE
+        public async Task<ResponseApi<User?>> CreateAsync(CreateUserDTO request)
+        {
+            try
+            {
+                ResponseApi<User?> isEmail = await userRepository.GetByEmailAsync(request.Email);
+                if(isEmail.Data is not null || !Validator.IsEmail(request.Email)) return new(null, 400, "E-mail inválido.");
+
+                if(Validator.IsReliable(request.Password).Equals("Ruim")) return new(null, 400, $"Senha é muito fraca");
+
+                ResponseApi<User?> isPhone = await userRepository.GetByPhoneAsync(request.Phone);
+                if(isPhone.Data is not null) return new(null, 400, "Celular inválido.");
+
+                dynamic access = Util.GenerateCodeAccess();
+
+                User user = new()
+                {
+                    UserName = $"usuário{access.CodeAccess}",
+                    Email = request.Email,
+                    Phone = request.Phone,
+                    Name = request.Name,
+                    Password = BCrypt.Net.BCrypt.HashPassword(request.Password),
+                    CodeAccess = access.CodeAccess,
+                    CodeAccessExpiration = access.CodeAccessExpiration,
+                    ValidatedAccess = false
+                };
+
+                ResponseApi<User?> response = await userRepository.CreateAsync(user);
+                if(response.Data is null) return new(null, 400, "Falha ao criar conta.");
+                
+                string messageCode = $"Seu código de verificação é: {access.CodeAccess}";
+                
+                await smsHandler.SendMessageAsync(request.Phone, messageCode);
+                
+                await mailHandler.SendMailAsync(request.Email, "Código de verificação", messageCode);
+
+                return new(response.Data, 201, "Conta criada com sucesso, foi enviado o código de verificação para seu celular e e-mail.");
+            }
+            catch
+            {                
+                return new(null, 500, $"Ocorreu um erro inesperado. Por favor, tente novamente mais tarde");
+            }
+        }
+        #endregion
+        
+        #region READ
+        public async Task<PaginationApi<List<dynamic>>> GetAllAsync(GetAllDTO request, string userId)
+        {
+            try
+            {
+                // bool hasAcess = await userRepository.GetAccessValitedAsync(userId);
+                // if(!hasAcess) {
+                //     ResponseApi<User?> user = await userRepository.GetByIdAsync(userId);
+                //     if(user.Data is null) return new(null, 404, "Falha ao listar usuários");
+                //     ResponseApi<User?> response = await ResendCodeAccessAsync(new() { Id = user.Data.Id, Email = user.Data.Email, Phone = user.Data.Phone });
+                //     if(!response.IsSuccess) return new(null, 404, "Falha ao listar usuários");
+                    
+                //     return new(null, 403, "Valide o código envido no seu celular ou e-mail");
+                // };
+
+                PaginationUtil<User> pagination = new(request.QueryParams);
+                ResponseApi<List<dynamic>> users = await userRepository.GetAllAsync(pagination);
+                int count = await userRepository.GetCountDocumentsAsync(pagination);
+                return new(users.Data, count, pagination.PageNumber, pagination.PageSize);
+            }
+            catch
+            {
+                return new(null, 500, "Ocorreu um erro inesperado. Por favor, tente novamente mais tarde.");
+            }
+        }
+        public async Task<ResponseApi<dynamic?>> GetByIdAggregateAsync(string id)
+        {
+            try
+            {
+                ResponseApi<dynamic?> user = await userRepository.GetByIdAggregateAsync(id);
+                if(user.Data is null) return new(null, 404, "Usuário não encontrado");
+                return new(user.Data);
+            }
+            catch
+            {
+                return new(null, 500, "Ocorreu um erro inesperado. Por favor, tente novamente mais tarde.");
+            }
+        }
+        public async Task<ResponseApi<List<dynamic>>> GetSelectBarberAsync(GetAllDTO request)
+        {
+            try
+            {
+                ResponseApi<List<dynamic>> users = await userRepository.GetSelectBarberAsync(new(request.QueryParams));
+                return new(users.Data);
+            }
+            catch
+            {
+                return new(null, 500, "Ocorreu um erro inesperado. Por favor, tente novamente mais tarde.");
+            }
+        }
+        #endregion
+        
+        #region UPDATE
+        public async Task<ResponseApi<User?>> ValidatedAccessAsync(string codeAccess)
+        {
+            try
+            {
+                ResponseApi<User?> user = await userRepository.ValidatedAccessAsync(codeAccess);
+                if(!user.IsSuccess) return new(null, 400, "Código inválido");
+                return new(user.Data, 201, "Código de acesso confirmado");
+            }
+            catch
+            {
+                return new(null, 500, "Ocorreu um erro inesperado. Por favor, tente novamente mais tarde.");
+            }
+        }
+        public async Task<ResponseApi<User?>> UpdateAsync(UpdateUserDTO request)
+        {
+            try
+            {
+                ResponseApi<User?> user = await userRepository.GetByIdAsync(request.Id);
+                if(user.Data is null || Validator.IsEmail(request.Email)) return new(null, 404, "Falha ao atualizar");
+                if(!Validator.IsEmail(request.Email)) return new(null, 404, "E-mail inválido.");
+
+                string code = new Random().Next(100000, 999999).ToString();
+                string messageCode = $"Seu código de verificação é: {code}";
+                
+                if (user.Data.Email != request.Email)
+                {
+                    ResponseApi<User?> isEmail = await userRepository.GetByEmailAsync(request.Email);
+                    if(isEmail.Data is not null) return new(null, 400, "E-mail inválido.");                    
+                    await mailHandler.SendMailAsync(request.Email, "Código de verificação", messageCode);
+                    user.Data.CodeAccess = code;
+                    user.Data.ValidatedAccess = false;
+                };
+
+                if (user.Data.Phone != request.Phone)
+                {
+                    ResponseApi<User?> isPhone = await userRepository.GetByPhoneAsync(request.Phone);
+                    if(isPhone.Data is not null) return new(null, 400, "Celular inválido.");
+                    await smsHandler.SendMessageAsync(user.Data.Phone, messageCode);
+                    user.Data.CodeAccess = code;
+                    user.Data.ValidatedAccess = false;
+                };
+             
+                if (user.Data.UserName != request.UserName)
+                {
+                    ResponseApi<User?> isUserName = await userRepository.GetByUserNameAsync(request.UserName);
+                    if(isUserName.Data is not null) return new(null, 400, "Nome de usuário inválido.");
+                };
+                
+                user.Data.UpdatedAt = DateTime.UtcNow;
+                user.Data.UserName = request.UserName;
+                user.Data.Email = request.Email;
+                user.Data.Phone = request.Phone;
+                user.Data.Name = request.Name;
+
+                ResponseApi<User?> response = await userRepository.UpdateAsync(user.Data);
+                if(!response.IsSuccess) return new(null, 400, "Falha ao atualizar");
+                return new(response.Data, 201, "Atualizado com sucesso");
+            }
+            catch
+            {
+                return new(null, 500, "Ocorreu um erro inesperado. Por favor, tente novamente mais tarde.");
+            }
+        }
+        public async Task<ResponseApi<User?>> ResendCodeAccessAsync(UpdateUserDTO request)
+        {
+            try
+            {
+                if(string.IsNullOrEmpty(request.Email) && string.IsNullOrEmpty(request.Phone)) return new(null, 400, "E-mail ou celular é obrigatório.");                    
+
+                User? user = new();
+
+                dynamic access = Util.GenerateCodeAccess();
+                string messageCode = $"Seu código de verificação é: {access.CodeAccess}";
+                
+                if (!string.IsNullOrEmpty(request.Email))
+                {
+                    ResponseApi<User?> isEmail = await userRepository.GetByEmailAsync(request.Email);
+                    if(isEmail.Data is null && !Validator.IsEmail(request.Email)) return new(null, 400, "E-mail inválido.");                    
+                    user = isEmail.Data;
+                    await mailHandler.SendMailAsync(request.Email, "Código de verificação", messageCode);
+                };
+
+                if (!string.IsNullOrEmpty(request.Phone))
+                {
+                    ResponseApi<User?> isPhone = await userRepository.GetByPhoneAsync(request.Phone);
+                    if(isPhone.Data is null) return new(null, 400, "Celular inválido.");
+                    user = isPhone.Data;
+                    await smsHandler.SendMessageAsync(request.Phone, messageCode);
+                };
+                                             
+                if(user is null) return new(null, 400, "Falha ao reenviar código de acesso");
+
+                user.UpdatedAt = DateTime.UtcNow;
+                user.CodeAccess = access.CodeAccess;
+                user.CodeAccessExpiration = access.CodeAccessExpiration;
+                user.ValidatedAccess = false;
+
+                ResponseApi<User?> response = await userRepository.UpdateAsync(user);
+                if(!response.IsSuccess) return new(null, 400, "Falha ao reenviar código de acesso");
+                return new(response.Data, 201, "Novo código de acesso enviado");
+            }
+            catch
+            {
+                return new(null, 500, "Ocorreu um erro inesperado. Por favor, tente novamente mais tarde.");
+            }
+        }
+        public async Task<ResponseApi<User?>> SavePhotoProfileAsync(SaveUserPhotoDTO request)
+        {
+            try
+            {
+                if (request.Photo == null || request.Photo.Length == 0) return new(null, 400, "Falha ao salvar foto de perfil");
+
+                ResponseApi<User?> user = await userRepository.GetByIdAsync(request.Id);
+                if(user.Data is null) return new(null, 404, "Falha ao salvar foto de perfil");
+
+                var tempPath = Path.GetTempFileName();
+
+                using (var stream = new FileStream(tempPath, FileMode.Create))
+                {
+                    request.Photo.CopyTo(stream);
+                }
+
+                string uriPhoto = await cloudinaryHandler.Upload(tempPath, "api-barber", "users");
+                if(string.IsNullOrEmpty(uriPhoto)) return new(null, 400, "Falha ao salvar foto de perfil");
+                user.Data.UpdatedAt = DateTime.UtcNow;
+                user.Data.Photo = uriPhoto;
+
+                ResponseApi<User?> response = await userRepository.UpdateAsync(user.Data);
+                if(!response.IsSuccess) return new(null, 400, "Falha ao salvar foto de perfil");
+                return new(response.Data, 201, "Foto de perfil salva com sucesso");
+            }
+            catch
+            {
+                return new(null, 500, "Ocorreu um erro inesperado. Por favor, tente novamente mais tarde.");
+            }
+        }
+        public async Task<ResponseApi<User?>> RemovePhotoProfileAsync(string id)
+        {
+            try
+            {
+                ResponseApi<User?> user = await userRepository.GetByIdAsync(id);
+                if(user.Data is null) return new(null, 404, "Falha ao remover foto de perfil");
+                string photo = user.Data.Photo.Split("/").Last();
+                string publicId = photo.Split(".")[0];
+
+                bool isRemoved = await cloudinaryHandler.Delete(publicId, "api-barber", "users");
+                if(!isRemoved) return new(null, 400, "Falha ao remover foto de perfil");
+                user.Data.UpdatedAt = DateTime.UtcNow;
+                user.Data.Photo = "";
+
+                ResponseApi<User?> response = await userRepository.UpdateAsync(user.Data);
+                if(!response.IsSuccess) return new(null, 400, "Falha ao remover foto de perfil");
+                return new(response.Data, 201, "Foto de perfil removida com sucesso");
+            }
+            catch
+            {
+                return new(null, 500, "Ocorreu um erro inesperado. Por favor, tente novamente mais tarde.");
+            }
+        }
+        #endregion
+        
+        #region DELETE
+        public async Task<ResponseApi<User>> DeleteAsync(string userId)
+        {
+            try
+            {
+                ResponseApi<User> user = await userRepository.DeleteAsync(userId);
+                if(!user.IsSuccess) return new(null, 400, user.Message);
+                return user;
+            }
+            catch
+            {
+                return new(null, 500, "Ocorreu um erro inesperado. Por favor, tente novamente mais tarde.");
+            }
+        }
+        #endregion        
+    }
+}
