@@ -136,7 +136,7 @@ namespace api_slim.src.Services
                 }
                 else
                 {
-                    template = MailTemplate.ForgotPasswordWeb($"/reset-password?codeAccess={user.Data.CodeAccess}");
+                    template = MailTemplate.ForgotPasswordWeb(user.Data.CodeAccess);
                 };
 
                 await mailHandler.SendMailAsync(request.Email, "Redefinição de Senha", template);
@@ -157,7 +157,7 @@ namespace api_slim.src.Services
             {
                 ResponseApi<User?> user = await userRepository.GetByCodeAccessAsync(request.CodeAccess);
 
-                if(user.Data is null) return new(null, 400, "Falha ao redefinir senha.");
+                if(user.Data is null) return new(null, 400, "Código inválido.");
 
                 if(DateTime.UtcNow > user.Data.CodeAccessExpiration) 
                 {

@@ -4,7 +4,7 @@ namespace api_slim.src.Shared.Templates
     public static class MailTemplate
     {
         private static readonly string UiURI =  Environment.GetEnvironmentVariable("UI_URI") ?? "";
-        public static string ForgotPasswordWeb(string resetLink)
+        public static string ForgotPasswordWeb(string code)
         {
             return $@"
                 <html>
@@ -38,8 +38,8 @@ namespace api_slim.src.Shared.Templates
                     <body>
                         <div class=""container"">
                         <h2>Redefinição de Senha</h2>
-                        <p>Você solicitou a alteração da sua senha. Clique no botão abaixo para criar uma nova senha:</p>
-                        <a href=""{UiURI}{resetLink}"" class=""button"">Alterar Senha</a>
+                        <p>Você solicitou a alteração da sua senha. Código de recuperação da nova senha:</p>
+                        <strong>{code}</strong>
                         <p>Se você não solicitou esta alteração, ignore este e-mail.</p>
                         <div class=""footer"">
                             <p>Este é um e-mail automático. Não responda esta mensagem.</p>

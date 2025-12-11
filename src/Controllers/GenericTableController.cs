@@ -27,6 +27,7 @@ namespace api_slim.src.Controllers
             return StatusCode(response.StatusCode, new { response.Message, response.Result });
         }
         
+        [Authorize]
         [HttpPost]
         public async Task<IActionResult> Create([FromBody] CreateGenericTableDTO genericTable)
         {
