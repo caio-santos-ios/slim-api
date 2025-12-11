@@ -44,5 +44,49 @@ namespace api_slim.src.Models
 
         [BsonElement("photo")]
         public string Photo {get;set;} = string.Empty;
+        
+        [BsonElement("modules")]
+        public List<Module> Modules {get;set;} = [];
+    }
+
+    public class Module 
+    {
+        [BsonElement("code")]
+        public string Code {get;set;} = string.Empty;
+        
+        [BsonElement("description")]
+        public string Description {get;set;} = string.Empty;
+
+        
+        [BsonElement("routines")]
+        public List<Routine> Routines {get;set;} = [];
+    }
+    
+    public class Routine 
+    {
+        [BsonElement("code")]
+        public string Code {get;set;} = string.Empty;
+        
+        [BsonElement("description")]
+        public string Description {get;set;} = string.Empty;
+
+        [BsonElement("permissions")]
+        public PermissionRoutine Permissions {get;set;} = new();
+    }
+
+    public class PermissionRoutine 
+    {
+        
+        [BsonElement("read")]
+        public bool Read {get;set;} = false;
+        
+        [BsonElement("create")]
+        public bool Create {get;set;} = false;
+        
+        [BsonElement("update")]
+        public bool Update {get;set;} = false;
+        
+        [BsonElement("delete")]
+        public bool Delete {get;set;} = false;
     }
 }

@@ -32,7 +32,7 @@ namespace api_slim.src.Services
                 bool isValid = BCrypt.Net.BCrypt.Verify(request.Password, user.Password);
                 if(!isValid) return new(null, 400, "Dados incorretos");
 
-                return new(new() {Token = GenerateJwtToken(user), RefreshToken = GenerateJwtToken(user, true) , Role = user.Role.ToString(), Id = user.Id});
+                return new(new() {Token = GenerateJwtToken(user), RefreshToken = GenerateJwtToken(user, true) , Name = user.Name, Id = user.Id});
             }
             catch
             {

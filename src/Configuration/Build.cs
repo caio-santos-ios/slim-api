@@ -66,6 +66,8 @@ namespace api_slim.src.Configuration
             builder.Services.AddTransient<IUserRepository, UserRepository>();                        
             builder.Services.AddTransient<IAccountsReceivableService, AccountsReceivableService>();
             builder.Services.AddTransient<IAccountsReceivableRepository, AccountsReceivableRepository>();                        
+            builder.Services.AddTransient<IGenericTableService, GenericTableService>();
+            builder.Services.AddTransient<IGenericTableRepository, GenericTableRepository>();                        
 
 
             // Handlers
