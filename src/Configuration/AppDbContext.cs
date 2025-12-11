@@ -32,10 +32,16 @@ namespace api_slim.src.Configuration
             }
         }
 
+        #region MASTER
         public IMongoCollection<User> Users
         {
             get { return Database.GetCollection<User>("users"); }
         }
+        public IMongoCollection<GenericTable> GenericTables
+        {
+            get { return Database.GetCollection<GenericTable>("generic_tables"); }
+        }
+        #endregion
 
         #region FIN
         public IMongoCollection<AccountsReceivable> AccountsReceivables
