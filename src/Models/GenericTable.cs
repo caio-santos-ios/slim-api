@@ -16,7 +16,7 @@ namespace api_slim.src.Models
         [BsonElement("code")]
         public string Code {get;set;} = string.Empty;
 
-        [BsonElement("Description")]
+        [BsonElement("description")]
         public string Description {get;set;} = string.Empty;
     }
 }
