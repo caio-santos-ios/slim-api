@@ -41,6 +41,46 @@ namespace api_slim.src.Configuration
         {
             get { return Database.GetCollection<GenericTable>("generic_tables"); }
         }
+        public IMongoCollection<Plan> Plans
+        {
+            get { return Database.GetCollection<Plan>("plans"); }
+        }
+        public IMongoCollection<Procedure> Procedures
+        {
+            get { return Database.GetCollection<Procedure>("procedures"); }
+        }
+        public IMongoCollection<Billing> Billings
+        {
+            get { return Database.GetCollection<Billing>("billings"); }
+        }
+        public IMongoCollection<Seller> Sellers
+        {
+            get { return Database.GetCollection<Seller>("sellers"); }
+        }
+        public IMongoCollection<Commission> Commissions
+        {
+            get { return Database.GetCollection<Commission>("commissions"); }
+        }
+        public IMongoCollection<AccreditedNetwork> AccreditedNetworks
+        {
+            get { return Database.GetCollection<AccreditedNetwork>("accredited_networks"); }
+        }
+        public IMongoCollection<Address> Addresses
+        {
+            get { return Database.GetCollection<Address>("addresses"); }
+        }
+        public IMongoCollection<Contact> Contacts
+        {
+            get { return Database.GetCollection<Contact>("contact"); }
+        }
+        public IMongoCollection<SellerRepresentative> SellerRepresentatives
+        {
+            get { return Database.GetCollection<SellerRepresentative>("seller_representatives"); }
+        }
+        public IMongoCollection<ServiceModule> ServiceModules
+        {
+            get { return Database.GetCollection<ServiceModule>("service_modules"); }
+        }
         #endregion
 
         #region FIN

@@ -1,8 +1,8 @@
 using api_slim.src.Models.Base;
-using api_slim.src.Responses.Auth;
-using api_slim.src.Shared.DTOs.Auth;
+using api_slim.src.Responses;
+using api_slim.src.Shared.DTOs;
 
-namespace api_slim.src.Interfaces.Auth
+namespace api_slim.src.Interfaces
 {
     public interface IAuthService
     {

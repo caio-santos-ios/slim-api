@@ -1,4 +1,4 @@
-namespace api_slim.src.Responses.Auth
+namespace api_slim.src.Responses
 {
     public class AuthResponse
     {

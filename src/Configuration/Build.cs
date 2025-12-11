@@ -1,8 +1,6 @@
 using System.Text;
 using api_slim.src.Handlers;
 using api_slim.src.Interfaces;
-using api_slim.src.Interfaces.Auth;
-using api_slim.src.Interfaces.User;
 using api_slim.src.Repository;
 using api_slim.src.Services;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
@@ -61,14 +59,33 @@ namespace api_slim.src.Configuration
         }
         public static void AddBuilderServices(this WebApplicationBuilder builder)
         {
-            builder.Services.AddTransient<IAuthService, AuthService>();
+            builder.Services.AddTransient<IAuthService, AuthService>();                  
             builder.Services.AddTransient<IUserService, UserService>();
-            builder.Services.AddTransient<IUserRepository, UserRepository>();                        
+            builder.Services.AddTransient<IUserRepository, UserRepository>();    
             builder.Services.AddTransient<IAccountsReceivableService, AccountsReceivableService>();
-            builder.Services.AddTransient<IAccountsReceivableRepository, AccountsReceivableRepository>();                        
+            builder.Services.AddTransient<IAccountsReceivableRepository, AccountsReceivableRepository>();    
             builder.Services.AddTransient<IGenericTableService, GenericTableService>();
-            builder.Services.AddTransient<IGenericTableRepository, GenericTableRepository>();                        
-
+            builder.Services.AddTransient<IGenericTableRepository, GenericTableRepository>();                       
+            builder.Services.AddTransient<IAccreditedNetworkService, AccreditedNetworkService>();
+            builder.Services.AddTransient<IAccreditedNetworkRepository, AccreditedNetworkRepository>();                        
+            builder.Services.AddTransient<IAddressService, AddressService>();
+            builder.Services.AddTransient<IAddressRepository, AddressRepository>();                        
+            builder.Services.AddTransient<IContactService, ContactService>();
+            builder.Services.AddTransient<IContactRepository, ContactRepository>();                        
+            builder.Services.AddTransient<ISellerRepresentativeService, SellerRepresentativeService>();
+            builder.Services.AddTransient<ISellerRepresentativeRepository, SellerRepresentativeRepository>();      
+            builder.Services.AddTransient<IPlanService, PlanService>();
+            builder.Services.AddTransient<IPlanRepository, PlanRepository>();
+            builder.Services.AddTransient<IProcedureService, ProcedureService>();
+            builder.Services.AddTransient<IProcedureRepository, ProcedureRepository>();
+            builder.Services.AddTransient<IBillingService, BillingService>();
+            builder.Services.AddTransient<IBillingRepository, BillingRepository>();
+            builder.Services.AddTransient<ISellerService, SellerService>();
+            builder.Services.AddTransient<ISellerRepository, SellerRepository>();
+            builder.Services.AddTransient<ICommissionService, CommissionService>();
+            builder.Services.AddTransient<ICommissionRepository, CommissionRepository>();
+            builder.Services.AddTransient<IServiceModuleService, ServiceModuleService>();
+            builder.Services.AddTransient<IServiceModuleRepository, ServiceModuleRepository>();                  
 
             // Handlers
             builder.Services.AddTransient<SmsHandler>();

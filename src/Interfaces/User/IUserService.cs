@@ -1,8 +1,7 @@
 using api_slim.src.Models.Base;
 using api_slim.src.Shared.DTOs;
-using api_slim.src.Shared.DTOs.User;
 
-namespace api_slim.src.Interfaces.User
+namespace api_slim.src.Interfaces
 {
     public interface IUserService
     {

@@ -3,7 +3,6 @@ using api_slim.src.Interfaces;
 using api_slim.src.Models;
 using api_slim.src.Models.Base;
 using api_slim.src.Shared.DTOs;
-using api_slim.src.Shared.DTOs.AccountsReceivable;
 using api_slim.src.Shared.Utils;
 using api_slim.src.Shared.Validators;
 using AutoMapper;

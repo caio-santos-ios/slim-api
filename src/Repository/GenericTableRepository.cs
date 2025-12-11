@@ -94,11 +94,6 @@ namespace api_slim.src.Repository
                 new("$project", new BsonDocument
                 {
                     {"_id", 0},
-                    {"password", 0},
-                    {"role", 0},
-                    {"blocked", 0},
-                    {"codeAccess", 0},
-                    {"validatedAccess", 0}
                 }),
                 new("$sort", pagination.PipelineSort),
             };
