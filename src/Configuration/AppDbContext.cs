@@ -81,6 +81,10 @@ namespace api_slim.src.Configuration
         {
             get { return Database.GetCollection<ServiceModule>("service_modules"); }
         }
+        public IMongoCollection<Professional> Professionals
+        {
+            get { return Database.GetCollection<Professional>("professionals"); }
+        }
         #endregion
 
         #region FIN

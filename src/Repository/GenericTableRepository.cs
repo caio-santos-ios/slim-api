@@ -28,8 +28,39 @@ namespace api_slim.src.Repository
                     }),
                     new("$project", new BsonDocument
                     {
-                        {"_id", 0},                     
+                        {"_id", 0},                 
+                        { "table", 1 },          // — IMPORTANTE! Precisamos dele para agrupar.
+                        { "id", 1 },
+                        { "code", 1 },
+                        { "description", 1 },
+                        { "active", 1 },
+                        { "createdAt", 1 },
+                        { "updatedAt", 1 }    
                     }),
+
+                    new BsonDocument("$group", new BsonDocument
+                    {
+                        { "_id", "$table" },
+                        { "items", new BsonDocument("$push", new BsonDocument
+                            {
+                                { "id", "$id" },
+                                { "code", "$code" },
+                                { "description", "$description" },
+                                { "active", "$active" },
+                                { "createdAt", "$createdAt" },
+                                { "updatedAt", "$updatedAt" }
+                            })
+                        }
+                    }),
+
+                    // RENAME _id → table
+                    new BsonDocument("$project", new BsonDocument
+                    {
+                        { "_id", 0 },
+                        { "table", "$_id" },
+                        { "items", 1 }
+                    }),
+
                     new("$sort", pagination.PipelineSort),
                 };
 
