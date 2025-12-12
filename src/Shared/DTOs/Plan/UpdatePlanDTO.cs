@@ -11,7 +11,8 @@ namespace api_slim.src.Shared.DTOs
         public string Type { get; set; } = string.Empty;
 
         public string Description { get; set; } = string.Empty;
+        public string ServiceModuleId { get; set; } = string.Empty;
 
-        public List<string>ServiceModules { get; set; } = new List<string>();
+        public bool Active {get;set;}
 }
 }

@@ -29,7 +29,7 @@ namespace api_slim.src.Repository
                     new("$project", new BsonDocument
                     {
                         {"_id", 0},                 
-                        { "table", 1 },          // — IMPORTANTE! Precisamos dele para agrupar.
+                        { "table", 1 },          
                         { "id", 1 },
                         { "code", 1 },
                         { "description", 1 },
@@ -53,7 +53,6 @@ namespace api_slim.src.Repository
                         }
                     }),
 
-                    // RENAME _id → table
                     new BsonDocument("$project", new BsonDocument
                     {
                         { "_id", 0 },
@@ -112,25 +111,104 @@ namespace api_slim.src.Repository
                 return new(null, 500, "Falha ao buscar Tabela Genérica"); ;
             }
         }
+        public async Task<ResponseApi<List<dynamic>>> GetByTableAggregateAsync(string table)
+        {
+            try
+            {
+                BsonDocument[] pipeline = [
+                    new("$match", new BsonDocument{
+                        {"table", table},
+                        {"deleted", false}
+                    }),
+                    new("$project", new BsonDocument
+                    {
+                        {"_id", 0},
+                        {"id", new BsonDocument("$toString", "$_id")},
+                        {"code", 1},
+                        {"description", 1},
+                        {"active", 1},
+                        {"table", 1}
+                    }),
+                ];
+
+                List<BsonDocument> results = await context.GenericTables.Aggregate<BsonDocument>(pipeline).ToListAsync();
+                List<dynamic> list = results.Select(doc => BsonSerializer.Deserialize<dynamic>(doc)).ToList();
+                return new(list);
+            }
+            catch
+            {
+                return new(null, 500, "Falha ao buscar Tabela Genérica"); ;
+            }
+        }
+        public async Task<ResponseApi<GenericTable?>> GetByCodeAsync(string code, string table, string? id = null)
+        {
+            try
+            {
+                if(id is not null)
+                {
+                    GenericTable? genericTableExistent = await context.GenericTables.Find(x => x.Code == code && x.Table == table && x.Id != id && !x.Deleted).FirstOrDefaultAsync();
+                    return new(genericTableExistent);
+                }
+                
+                GenericTable? genericTable = await context.GenericTables.Find(x => x.Code == code && !x.Deleted).FirstOrDefaultAsync();
+                return new(genericTable);
+            }
+            catch
+            {
+                return new(null, 500, "Falha ao buscar Tabela Genérica"); ;
+            }
+        }
         public async Task<int> GetCountDocumentsAsync(PaginationUtil<GenericTable> pagination)
         {
             List<BsonDocument> pipeline = new()
-            {
-                new("$match", pagination.PipelineFilter),
-                new("$sort", pagination.PipelineSort),
-                new("$addFields", new BsonDocument
                 {
-                    {"id", new BsonDocument("$toString", "$_id")},
-                }),
-                new("$project", new BsonDocument
-                {
-                    {"_id", 0},
-                }),
-                new("$sort", pagination.PipelineSort),
-            };
+                    new("$match", pagination.PipelineFilter),
+                    new("$sort", pagination.PipelineSort),
+                    new("$skip", pagination.Skip),
+                    new("$limit", pagination.Limit),
+                    new("$addFields", new BsonDocument
+                    {
+                        {"id", new BsonDocument("$toString", "$_id")},
+                    }),
+                    new("$project", new BsonDocument
+                    {
+                        {"_id", 0},                 
+                        { "table", 1 },          
+                        { "id", 1 },
+                        { "code", 1 },
+                        { "description", 1 },
+                        { "active", 1 },
+                        { "createdAt", 1 },
+                        { "updatedAt", 1 }    
+                    }),
 
-            List<BsonDocument> results = await context.GenericTables.Aggregate<BsonDocument>(pipeline).ToListAsync();
-            return results.Select(doc => BsonSerializer.Deserialize<dynamic>(doc)).Count();
+                    new BsonDocument("$group", new BsonDocument
+                    {
+                        { "_id", "$table" },
+                        { "items", new BsonDocument("$push", new BsonDocument
+                            {
+                                { "id", "$id" },
+                                { "code", "$code" },
+                                { "description", "$description" },
+                                { "active", "$active" },
+                                { "createdAt", "$createdAt" },
+                                { "updatedAt", "$updatedAt" }
+                            })
+                        }
+                    }),
+
+                    new BsonDocument("$project", new BsonDocument
+                    {
+                        { "_id", 0 },
+                        { "table", "$_id" },
+                        { "items", 1 }
+                    }),
+
+                    new("$sort", pagination.PipelineSort),
+                };
+
+                List<BsonDocument> results = await context.GenericTables.Aggregate<BsonDocument>(pipeline).ToListAsync();
+                return results.Select(doc => BsonSerializer.Deserialize<dynamic>(doc)).Count();
         }
         #endregion
         #region CREATE

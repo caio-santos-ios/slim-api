@@ -22,7 +22,7 @@ namespace api_slim.src.Models
         [BsonElement("description")]
         public string Description { get; set; } = string.Empty;
 
-        [BsonElement("serviceModules")]
-        public List<string>ServiceModules { get; set; } = new List<string>();
+        [BsonElement("serviceModuleId")]
+        public string ServiceModuleId { get; set; } = string.Empty;
     }
 }
