@@ -87,7 +87,7 @@ namespace api_slim.src.Services
         {
             ResponseApi<AccreditedNetwork> billing = await billingRepository.DeleteAsync(id);
             if(!billing.IsSuccess) return new(null, 400, billing.Message);
-            return billing;
+            return new(null, 204, "Exclído com sucesso");
         }
         catch
         {

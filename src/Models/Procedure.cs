@@ -23,7 +23,7 @@ namespace api_slim.src.Models
         public string ServiceModuleId { get; set; } = string.Empty;
 
         [BsonElement("externalCodes")]
-        public List<string> ExternalCodes { get; set; } = new List<string>();
+        public string ExternalCodes { get; set; } = string.Empty;
 
         [BsonElement("notes")]
         public string Notes { get; set; } = string.Empty;

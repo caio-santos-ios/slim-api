@@ -87,7 +87,7 @@ namespace api_slim.src.Services
         {
             ResponseApi<Plan> plan = await planRepository.DeleteAsync(id);
             if(!plan.IsSuccess) return new(null, 400, plan.Message);
-            return plan;
+            return new(null, 204, "Exclído com sucesso");
         }
         catch
         {

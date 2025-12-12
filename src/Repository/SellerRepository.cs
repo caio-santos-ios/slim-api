@@ -22,9 +22,52 @@ namespace api_slim.src.Repository
                 new("$sort", pagination.PipelineSort),
                 new("$skip", pagination.Skip),
                 new("$limit", pagination.Limit),
+
+                new BsonDocument("$lookup", new BsonDocument
+                {
+                    { "from", "addresses" },
+
+                    { "let", new BsonDocument("profId", "$_id") },
+
+                    { "pipeline", new BsonArray
+                        {
+                            new BsonDocument("$match", new BsonDocument
+                            {
+                                { "$expr",
+                                    new BsonDocument("$eq",
+                                        new BsonArray
+                                        {
+                                            new BsonDocument("$toObjectId", "$parentId"), 
+                                            "$$profId"                                     
+                                        }
+                                    )
+                                }
+                            })
+                        }
+                    },
+
+                    { "as", "_address" }
+                }),
+
+                new BsonDocument("$unwind", "$_address"),
+
                 new("$addFields", new BsonDocument
                 {
                     {"id", new BsonDocument("$toString", "$_id")},
+                    {"address", new BsonDocument
+                        {
+                            {"id", new BsonDocument("$toString", "$_address._id")},
+                            {"street", new BsonDocument("$ifNull", new BsonArray { "$_address.street", "" })},
+                            {"number", new BsonDocument("$ifNull", new BsonArray {"$_address.number" , "" })},
+                            {"complement", new BsonDocument("$ifNull", new BsonArray {"$_address.complement" , "" })},
+                            {"neighborhood", new BsonDocument("$ifNull", new BsonArray {"$_address.neighborhood" , "" })},
+                            {"city", new BsonDocument("$ifNull", new BsonArray {"$_address.city" , "" })},
+                            {"state", new BsonDocument("$ifNull", new BsonArray {"$_address.state" , "" })},
+                            {"zipCode", new BsonDocument("$ifNull", new BsonArray {"$_address.zipCode" , "" })},
+                            {"parent", new BsonDocument("$ifNull", new BsonArray {"$_address.parent" , "" })},
+                            {"parentId", new BsonDocument("$ifNull", new BsonArray {"$_address.parentId" , "" })},
+                        }
+                    },
                 }),
                 new("$project", new BsonDocument
                 {

@@ -87,7 +87,7 @@ namespace api_slim.src.Services
         {
             ResponseApi<Address> address = await addressRepository.DeleteAsync(id);
             if(!address.IsSuccess) return new(null, 400, address.Message);
-            return address;
+            return new(null, 204, "Exclído com sucesso");
         }
         catch
         {

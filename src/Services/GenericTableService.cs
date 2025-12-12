@@ -103,7 +103,7 @@ namespace api_slim.src.Services
             {
                 ResponseApi<GenericTable> genericTable = await genericTableRepository.DeleteAsync(genericTableId);
                 if(!genericTable.IsSuccess) return new(null, 400, genericTable.Message);
-                return genericTable;
+                return new(null, 204, "Exclído com sucesso");
             }
             catch
             {
