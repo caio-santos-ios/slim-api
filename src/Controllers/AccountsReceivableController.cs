@@ -1,8 +1,7 @@
-using System.Security.Claims;
 using api_slim.src.Interfaces;
 using api_slim.src.Models;
 using api_slim.src.Models.Base;
-using api_slim.src.Shared.DTOs.AccountsReceivable;
+using api_slim.src.Shared.DTOs;
 using Microsoft.AspNetCore.Mvc;
 
 namespace api_slim.src.Controllers

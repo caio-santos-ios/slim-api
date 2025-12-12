@@ -1,4 +1,4 @@
-namespace api_slim.src.Shared.DTOs.User
+namespace api_slim.src.Shared.DTOs
 {
     public class UpdateUserDTO
     {

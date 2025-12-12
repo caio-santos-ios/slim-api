@@ -1,4 +1,4 @@
-namespace api_slim.src.Shared.DTOs.Auth
+namespace api_slim.src.Shared.DTOs
 {
     public class RefreshDTO
     {

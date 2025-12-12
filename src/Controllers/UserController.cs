@@ -1,8 +1,8 @@
 using System.Security.Claims;
-using api_slim.src.Interfaces.User;
+using api_slim.src.Interfaces;
 using api_slim.src.Models;
 using api_slim.src.Models.Base;
-using api_slim.src.Shared.DTOs.User;
+using api_slim.src.Shared.DTOs;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 

@@ -1,4 +1,4 @@
-namespace api_slim.src.Shared.DTOs.AccountsReceivable
+namespace api_slim.src.Shared.DTOs
 {
     public class CreateAccountsReceivableDTO
     {

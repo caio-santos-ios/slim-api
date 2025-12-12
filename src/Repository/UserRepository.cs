@@ -1,5 +1,5 @@
 using api_slim.src.Configuration;
-using api_slim.src.Interfaces.User;
+using api_slim.src.Interfaces;
 using api_slim.src.Models;
 using api_slim.src.Models.Base;
 using api_slim.src.Shared.Utils;

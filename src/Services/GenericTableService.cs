@@ -29,7 +29,19 @@ namespace api_slim.src.Services
             try
             {
                 ResponseApi<dynamic?> genericTable = await genericTableRepository.GetByIdAggregateAsync(id);
-                if(genericTable.Data is null) return new(null, 404, "Usuário não encontrado");
+                if(genericTable.Data is null) return new(null, 404, "Tabela Genérica não encontrado");
+                return new(genericTable.Data);
+            }
+            catch
+            {
+                return new(null, 500, "Ocorreu um erro inesperado. Por favor, tente novamente mais tarde.");
+            }
+        }
+        public async Task<ResponseApi<List<dynamic>>> GetByTableAggregateAsync(string table)
+        {
+            try
+            {
+                ResponseApi<List<dynamic>> genericTable = await genericTableRepository.GetByTableAggregateAsync(table);
                 return new(genericTable.Data);
             }
             catch
@@ -44,6 +56,10 @@ namespace api_slim.src.Services
             try
             {
                 GenericTable genericTable = _mapper.Map<GenericTable>(request);
+
+                ResponseApi<GenericTable?> genericTableExisted = await genericTableRepository.GetByCodeAsync(request.Code, request.Table);
+                if(genericTableExisted.Data is not null) return new(null, 400, "Código já existente");
+
                 ResponseApi<GenericTable?> response = await genericTableRepository.CreateAsync(genericTable);
 
                 if(response.Data is null) return new(null, 400, "Falha ao criar conta.");
@@ -61,8 +77,12 @@ namespace api_slim.src.Services
             try
             {
                 ResponseApi<GenericTable?> genericTable = await genericTableRepository.GetByIdAsync(request.Id);
+
                 if(genericTable.Data is null) return new(null, 404, "Falha ao atualizar");
-                
+
+                ResponseApi<GenericTable?> genericTableExisted = await genericTableRepository.GetByCodeAsync(request.Code, request.Table, request.Id);
+                if(genericTableExisted.Data is not null) return new(null, 400, "Código já existente");
+
                 genericTable.Data = _mapper.Map<GenericTable>(request);
                 genericTable.Data.UpdatedAt = DateTime.UtcNow;
 
@@ -75,8 +95,7 @@ namespace api_slim.src.Services
                 return new(null, 500, "Ocorreu um erro inesperado. Por favor, tente novamente mais tarde.");
             }
         }
-        #endregion
-        
+        #endregion       
         #region DELETE
         public async Task<ResponseApi<GenericTable>> DeleteAsync(string genericTableId)
         {

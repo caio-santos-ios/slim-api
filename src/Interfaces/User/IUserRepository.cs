@@ -1,7 +1,7 @@
 using api_slim.src.Models.Base;
 using api_slim.src.Shared.Utils;
 
-namespace api_slim.src.Interfaces.User
+namespace api_slim.src.Interfaces
 {
     public interface IUserRepository
     {
