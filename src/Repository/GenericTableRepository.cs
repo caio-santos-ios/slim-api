@@ -150,7 +150,7 @@ namespace api_slim.src.Repository
                     return new(genericTableExistent);
                 }
                 
-                GenericTable? genericTable = await context.GenericTables.Find(x => x.Code == code && !x.Deleted).FirstOrDefaultAsync();
+                GenericTable? genericTable = await context.GenericTables.Find(x => x.Code == code  && x.Table == table && !x.Deleted).FirstOrDefaultAsync();
                 return new(genericTable);
             }
             catch
