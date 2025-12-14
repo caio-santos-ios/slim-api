@@ -90,7 +90,7 @@ namespace api_slim.src.Services
         {
             ResponseApi<Procedure> procedure = await procedureRepository.DeleteAsync(id);
             if(!procedure.IsSuccess) return new(null, 400, procedure.Message);
-            return new(null, 204, "Exclído com sucesso");
+            return new(null, 204, "Excluído com sucesso");
         }
         catch
         {

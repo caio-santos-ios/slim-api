@@ -87,7 +87,7 @@ namespace api_slim.src.Services
         {
             ResponseApi<ServiceModule> serviceModule = await serviceModuleRepository.DeleteAsync(id);
             if(!serviceModule.IsSuccess) return new(null, 400, serviceModule.Message);
-            return new(null, 204, "Exclído com sucesso");
+            return new(null, 204, "Excluído com sucesso");
         }
         catch
         {

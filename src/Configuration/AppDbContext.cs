@@ -71,7 +71,7 @@ namespace api_slim.src.Configuration
         }
         public IMongoCollection<Contact> Contacts
         {
-            get { return Database.GetCollection<Contact>("contact"); }
+            get { return Database.GetCollection<Contact>("contacts"); }
         }
         public IMongoCollection<SellerRepresentative> SellerRepresentatives
         {
@@ -84,6 +84,10 @@ namespace api_slim.src.Configuration
         public IMongoCollection<Professional> Professionals
         {
             get { return Database.GetCollection<Professional>("professionals"); }
+        }
+        public IMongoCollection<Attachment> Attachments
+        {
+            get { return Database.GetCollection<Attachment>("attachments"); }
         }
         #endregion
 

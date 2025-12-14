@@ -98,7 +98,7 @@ namespace api_slim.src.Services
         {
             ResponseApi<Seller> seller = await sellerRepository.DeleteAsync(id);
             if(!seller.IsSuccess) return new(null, 400, seller.Message);
-            return new(null, 204, "Exclído com sucesso");
+            return new(null, 204, "Excluído com sucesso");
         }
         catch
         {

@@ -10,6 +10,8 @@ namespace api_slim.src.Interfaces
         Task<ResponseApi<dynamic?>> GetByIdAggregateAsync(string id);
         Task<ResponseApi<SellerRepresentative?>> CreateAsync(CreateSellerRepresentativeDTO request);
         Task<ResponseApi<SellerRepresentative?>> UpdateAsync(UpdateSellerRepresentativeDTO request);
+        Task<ResponseApi<SellerRepresentative?>> UpdateResponsibleAsync(UpdateSellerRepresentativeDTO request);
+        Task<ResponseApi<SellerRepresentative?>> UpdateSellerAsync(UpdateSellerRepresentativeDTO request);
         Task<ResponseApi<SellerRepresentative>> DeleteAsync(string id);
     }
 }

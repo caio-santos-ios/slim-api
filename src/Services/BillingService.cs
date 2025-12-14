@@ -87,7 +87,7 @@ namespace api_slim.src.Services
         {
             ResponseApi<Billing> billing = await billingRepository.DeleteAsync(id);
             if(!billing.IsSuccess) return new(null, 400, billing.Message);
-            return new(null, 204, "Exclído com sucesso");
+            return new(null, 204, "Excluído com sucesso");
         }
         catch
         {

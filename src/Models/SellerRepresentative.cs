@@ -18,7 +18,7 @@ namespace api_slim.src.Models
         public string CNPJ { get; set; } = string.Empty;
         
         [BsonElement("tradeName")]
-        public string tradeName { get; set; } = string.Empty;
+        public string TradeName { get; set; } = string.Empty;
 
         [BsonElement("corporateName")]
         public string CorporateName { get; set; } = string.Empty;
@@ -28,28 +28,25 @@ namespace api_slim.src.Models
 
         [BsonElement("whatsapp")]
         public string Whatsapp { get; set; } = string.Empty;
+        
+        [BsonElement("email")]
+        public string Email { get; set; } = string.Empty;
 
         [BsonElement("effectiveDate")]
-        public DateTime EffectiveDate { get; set; }
-
-        [BsonElement("sellers")]
-        public List<string> Selllers { get; set; } = new();
-
-        [BsonElement("address")]
-        public Address Address { get; set; } = new Address();
+        public DateTime? EffectiveDate { get; set; }
 
         [BsonElement("responsible")]
-        public RepresentativeResponsible RepresentativeResponsible { get; set; } = new();
-       
-        [BsonElement("representativeContact")]
-        public List<Contact> Contacts { get; set; } = new();
+        public RepresentativeResponsible Responsible { get; set; } = new();
+
+        [BsonElement("bank")]
+        public RepresentativeBank Bank { get; set; } = new();
     }
 
     public class RepresentativeResponsible
     {
 
         [BsonElement("dateOfBirth")]
-        public DateTime DateOfBirth { get; set; }
+        public DateTime? DateOfBirth { get; set; }
 
         [BsonElement("gender")]
         public string Gender { get; set; } = string.Empty;
@@ -61,10 +58,7 @@ namespace api_slim.src.Models
         public string Cpf { get; set; } = string.Empty;
 
         [BsonElement("rg")]
-        public string rg { get; set; } = string.Empty;
-
-        [BsonElement("address")]
-        public Address Address { get; set; } = new Address();
+        public string Rg { get; set; } = string.Empty;
 
         [BsonElement("phone")]
         public string Phone { get; set; } = string.Empty;

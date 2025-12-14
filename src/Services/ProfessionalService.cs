@@ -98,7 +98,7 @@ namespace api_slim.src.Services
         {
             ResponseApi<Professional> professional = await professionalRepository.DeleteAsync(id);
             if(!professional.IsSuccess) return new(null, 400, professional.Message);
-            return new(null, 204, "Exclído com sucesso");
+            return new(null, 204, "Excluído com sucesso");
         }
         catch
         {

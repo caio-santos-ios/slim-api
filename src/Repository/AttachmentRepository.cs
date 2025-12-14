@@ -9,10 +9,10 @@ using MongoDB.Driver;
 
 namespace api_slim.src.Repository
 {
-    public class AddressRepository(AppDbContext context) : IAddressRepository
+    public class AttachmentRepository(AppDbContext context) : IAttachmentRepository
 {
     #region READ
-    public async Task<ResponseApi<List<dynamic>>> GetAllAsync(PaginationUtil<Address> pagination)
+    public async Task<ResponseApi<List<dynamic>>> GetAllAsync(PaginationUtil<Attachment> pagination)
     {
         try
         {
@@ -33,13 +33,13 @@ namespace api_slim.src.Repository
                 new("$sort", pagination.PipelineSort),
             };
 
-            List<BsonDocument> results = await context.Addresses.Aggregate<BsonDocument>(pipeline).ToListAsync();
+            List<BsonDocument> results = await context.Attachments.Aggregate<BsonDocument>(pipeline).ToListAsync();
             List<dynamic> list = results.Select(doc => BsonSerializer.Deserialize<dynamic>(doc)).ToList();
             return new(list);
         }
         catch
         {
-            return new(null, 500, "Falha ao buscar Items");
+            return new(null, 500, "Falha ao buscar Anexos");
         }
     }
     
@@ -61,42 +61,42 @@ namespace api_slim.src.Repository
                 }),
             ];
 
-            BsonDocument? response = await context.Addresses.Aggregate<BsonDocument>(pipeline).FirstOrDefaultAsync();
+            BsonDocument? response = await context.Attachments.Aggregate<BsonDocument>(pipeline).FirstOrDefaultAsync();
             dynamic? result = response is null ? null : BsonSerializer.Deserialize<dynamic>(response);
-            return result is null ? new(null, 404, "Item não encontrado") : new(result);
+            return result is null ? new(null, 404, "Anexo não encontrado") : new(result);
         }
         catch
         {
-            return new(null, 500, "Falha ao buscar Item");
+            return new(null, 500, "Falha ao buscar Anexo");
         }
     }
     
-    public async Task<ResponseApi<Address?>> GetByIdAsync(string id)
+    public async Task<ResponseApi<Attachment?>> GetByIdAsync(string id)
     {
         try
         {
-            Address? address = await context.Addresses.Find(x => x.Id == id && !x.Deleted).FirstOrDefaultAsync();
-            return new(address);
+            Attachment? attachment = await context.Attachments.Find(x => x.Id == id && !x.Deleted).FirstOrDefaultAsync();
+            return new(attachment);
         }
         catch
         {
-            return new(null, 500, "Falha ao buscar Item");
+            return new(null, 500, "Falha ao buscar Anexo");
         }
     }
-    public async Task<ResponseApi<Address?>> GetByParentIdAsync(string parentId, string parent)
+    public async Task<ResponseApi<Attachment?>> GetByParentIdAsync(string parentId, string parent)
     {
         try
         {
-            Address? address = await context.Addresses.Find(x => x.ParentId == parentId && x.Parent == parent && !x.Deleted).FirstOrDefaultAsync();
-            return new(address);
+            Attachment? attachment = await context.Attachments.Find(x => x.ParentId == parentId && x.Parent == parent && !x.Deleted).FirstOrDefaultAsync();
+            return new(attachment);
         }
         catch
         {
-            return new(null, 500, "Falha ao buscar Item");
+            return new(null, 500, "Falha ao buscar Anexo");
         }
     }
     
-    public async Task<int> GetCountDocumentsAsync(PaginationUtil<Address> pagination)
+    public async Task<int> GetCountDocumentsAsync(PaginationUtil<Attachment> pagination)
     {
         List<BsonDocument> pipeline = new()
         {
@@ -113,73 +113,73 @@ namespace api_slim.src.Repository
             new("$sort", pagination.PipelineSort),
         };
 
-        List<BsonDocument> results = await context.Addresses.Aggregate<BsonDocument>(pipeline).ToListAsync();
+        List<BsonDocument> results = await context.Attachments.Aggregate<BsonDocument>(pipeline).ToListAsync();
         return results.Select(doc => BsonSerializer.Deserialize<dynamic>(doc)).Count();
     }
     #endregion
     
     #region CREATE
-    public async Task<ResponseApi<Address?>> CreateAsync(Address address)
+    public async Task<ResponseApi<Attachment?>> CreateAsync(Attachment attachment)
     {
         try
         {
-            await context.Addresses.InsertOneAsync(address);
+            await context.Attachments.InsertOneAsync(attachment);
 
-            return new(address, 201, "Item criado com sucesso");
+            return new(attachment, 201, "Anexo criado com sucesso");
         }
         catch
         {
-            return new(null, 500, "Falha ao criar Item");  
+            return new(null, 500, "Falha ao criar Anexo");  
         }
     }
     #endregion
     
     #region UPDATE
-    public async Task<ResponseApi<Address?>> UpdateAsync(Address address)
+    public async Task<ResponseApi<Attachment?>> UpdateAsync(Attachment attachment)
     {
         try
         {
-            await context.Addresses.ReplaceOneAsync(x => x.Id == address.Id, address);
+            await context.Attachments.ReplaceOneAsync(x => x.Id == attachment.Id, attachment);
 
-            return new(address, 201, "Item atualizado com sucesso");
+            return new(attachment, 201, "Anexo atualizado com sucesso");
         }
         catch
         {
-            return new(null, 500, "Falha ao atualizar Item");
+            return new(null, 500, "Falha ao atualizar Anexo");
         }
     }
-    public async Task<ResponseApi<Address?>> UpdateParentAsync(Address address)
+    public async Task<ResponseApi<Attachment?>> UpdateParentAsync(Attachment attachment)
     {
         try
         {
-            await context.Addresses.ReplaceOneAsync(x => x.ParentId == address.ParentId && x.Parent == address.Parent, address);
+            await context.Attachments.ReplaceOneAsync(x => x.ParentId == attachment.ParentId && x.Parent == attachment.Parent, attachment);
 
-            return new(address, 201, "Item atualizado com sucesso");
+            return new(attachment, 201, "Anexo atualizado com sucesso");
         }
         catch
         {
-            return new(null, 500, "Falha ao atualizar Item");
+            return new(null, 500, "Falha ao atualizar Anexo");
         }
     }
     #endregion
     
     #region DELETE
-    public async Task<ResponseApi<Address>> DeleteAsync(string id)
+    public async Task<ResponseApi<Attachment>> DeleteAsync(string id)
     {
         try
         {
-            Address? address = await context.Addresses.Find(x => x.Id == id && !x.Deleted).FirstOrDefaultAsync();
-            if(address is null) return new(null, 404, "Item não encontrado");
-            address.Deleted = true;
-            address.DeletedAt = DateTime.UtcNow;
+            Attachment? attachment = await context.Attachments.Find(x => x.Id == id && !x.Deleted).FirstOrDefaultAsync();
+            if(attachment is null) return new(null, 404, "Anexo não encontrado");
+            attachment.Deleted = true;
+            attachment.DeletedAt = DateTime.UtcNow;
 
-            await context.Addresses.ReplaceOneAsync(x => x.Id == id, address);
+            await context.Attachments.ReplaceOneAsync(x => x.Id == id, attachment);
 
-            return new(address, 204, "Item excluído com sucesso");
+            return new(attachment, 204, "Anexo excluído com sucesso");
         }
         catch
         {
-            return new(null, 500, "Falha ao excluír Item");
+            return new(null, 500, "Falha ao excluír Anexo");
         }
     }
     #endregion

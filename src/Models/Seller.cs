@@ -27,6 +27,8 @@ namespace api_slim.src.Models
 
         [BsonElement("type")]
         public string Type { get; set; } = string.Empty;
-
+        
+        [BsonElement("parentId")]
+        public string ParentId { get; set; } = string.Empty;
     }
 }
