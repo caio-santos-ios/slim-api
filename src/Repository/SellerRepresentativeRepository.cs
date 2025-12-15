@@ -129,7 +129,7 @@ namespace api_slim.src.Repository
                 {
                     { "from", "addresses" },
 
-                    { "let", new BsonDocument("profId", "$_id") },
+                    { "let", new BsonDocument("profId", "$_seller._id") },
 
                     { "pipeline", new BsonArray
                         {
@@ -146,7 +146,7 @@ namespace api_slim.src.Repository
                                         new BsonDocument("$eq", new BsonArray
                                         {
                                             "$parent",
-                                            "seller-representative-seller"
+                                            "seller"
                                         })
                                     })
                                 }

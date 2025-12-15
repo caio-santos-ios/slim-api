@@ -8,6 +8,7 @@ namespace api_slim.src.Interfaces
 {
     Task<PaginationApi<List<dynamic>>> GetAllAsync(GetAllDTO request);
     Task<ResponseApi<dynamic?>> GetByIdAggregateAsync(string id);
+    Task<ResponseApi<Address?>> GetByParentIdAsync(string parentId, string parent);
     Task<ResponseApi<Address?>> CreateAsync(CreateAddressDTO request);
     Task<ResponseApi<Address?>> UpdateAsync(UpdateAddressDTO request);
     Task<ResponseApi<Address>> DeleteAsync(string id);

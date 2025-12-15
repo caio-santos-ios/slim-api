@@ -38,6 +38,19 @@ namespace api_slim.src.Services
             return new(null, 500, "Ocorreu um erro inesperado. Por favor, tente novamente mais tarde.");
         }
     }
+    public async Task<ResponseApi<Address?>> GetByParentIdAsync(string parentId, string parent)
+    {
+        try
+        {
+            ResponseApi<Address?> address = await addressRepository.GetByParentIdAsync(parentId, parent);
+            if(address.Data is null) return new(null, 404, "Item não encontrado");
+            return new(address.Data);
+        }
+        catch
+        {
+            return new(null, 500, "Ocorreu um erro inesperado. Por favor, tente novamente mais tarde.");
+        }
+    }
     #endregion
     
     #region CREATE

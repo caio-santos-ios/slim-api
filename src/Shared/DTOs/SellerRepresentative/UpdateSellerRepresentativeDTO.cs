@@ -23,7 +23,7 @@ public class UpdateSellerRepresentativeDTO
         public Address Address { get; set; } = new();
         public Contact Contact { get; set; } = new();
         public Seller Seller { get; set; } = new();
-        public RepresentativeResponsible Responsible { get; set; } = new();
+        public CreateResponsibleDTO Responsible { get; set; } = new();
         public RepresentativeBank Bank { get; set; } = new();
 }
 }

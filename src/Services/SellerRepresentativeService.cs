@@ -118,23 +118,35 @@ namespace api_slim.src.Services
             ResponseApi<SellerRepresentative?> sellerRepresentativeResponse = await sellerRepresentativeRepository.GetByIdAsync(request.Id);
             if(sellerRepresentativeResponse.Data is null) return new(null, 404, "Falha ao atualizar");
             
-            SellerRepresentative sellerRepresentative = _mapper.Map<SellerRepresentative>(request);
-            sellerRepresentative.UpdatedAt = DateTime.UtcNow;
+            sellerRepresentativeResponse.Data.Responsible = new ()
+            {
+                DateOfBirth = request.Responsible.DateOfBirth,
+                Gender = request.Responsible.Gender,
+                Name = request.Responsible.Name,
+                Cpf = request.Responsible.Cpf,
+                Rg = request.Responsible.Rg,
+                Phone = request.Responsible.Phone,
+                Whatsapp = request.Responsible.Whatsapp,
+                Notes = request.Responsible.Notes,
+                Email = request.Responsible.Email,
+            };
 
-            ResponseApi<SellerRepresentative?> response = await sellerRepresentativeRepository.UpdateAsync(sellerRepresentative);
+            sellerRepresentativeResponse.Data.UpdatedAt = DateTime.UtcNow;
+
+            ResponseApi<SellerRepresentative?> response = await sellerRepresentativeRepository.UpdateAsync(sellerRepresentativeResponse.Data!);
             if(!response.IsSuccess) return new(null, 400, "Falha ao atualizar");
 
-            if(string.IsNullOrEmpty(request.Address.Id))
+            if(string.IsNullOrEmpty(request.Responsible.Address.Id))
             {
-                Address address = _mapper.Map<Address>(request.Address);
+                Address address = _mapper.Map<Address>(request.Responsible.Address);
                 address.Parent = "seller-representative-responsible";
-                address.ParentId = response.Data!.Id;
+                address.ParentId = request.Id;
                 ResponseApi<Address?> addressResponse = await addressRepository.CreateAsync(address);
                 if(!addressResponse.IsSuccess) return new(null, 400, "Falha ao criar Item.");
             } 
             else
             {
-                ResponseApi<Address?> addressResponse = await addressRepository.UpdateAsync(request.Address);
+                ResponseApi<Address?> addressResponse = await addressRepository.UpdateAsync(request.Responsible.Address);
                 if(!addressResponse.IsSuccess) return new(null, 400, "Falha ao atualizar.");
             }
 
