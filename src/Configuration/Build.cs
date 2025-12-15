@@ -88,6 +88,8 @@ namespace api_slim.src.Configuration
             builder.Services.AddTransient<IServiceModuleRepository, ServiceModuleRepository>();                  
             builder.Services.AddTransient<IProfessionalService, ProfessionalService>();
             builder.Services.AddTransient<IProfessionalRepository, ProfessionalRepository>();                  
+            builder.Services.AddTransient<IAttachmentService, AttachmentService>();
+            builder.Services.AddTransient<IAttachmentRepository, AttachmentRepository>();                  
 
             // Handlers
             builder.Services.AddTransient<SmsHandler>();

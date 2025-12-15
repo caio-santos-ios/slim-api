@@ -7,7 +7,7 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace api_slim.src.Controllers
 {
-    [Route("api/seller-representative")]
+    [Route("api/seller-representatives")]
     [ApiController]
     public class SellerRepresentativeController(ISellerRepresentativeService sellerRepresentativeService) : ControllerBase
     {
@@ -35,7 +35,7 @@ namespace api_slim.src.Controllers
 
             ResponseApi<SellerRepresentative?> response = await sellerRepresentativeService.CreateAsync(sellerRepresentative);
 
-            return StatusCode(response.StatusCode, new { response.Message });
+            return StatusCode(response.StatusCode, new { response.Message, response.Data });
         }
         
         [Authorize]
@@ -45,6 +45,28 @@ namespace api_slim.src.Controllers
             if (sellerRepresentative == null) return BadRequest("Dados inválidos.");
 
             ResponseApi<SellerRepresentative?> response = await sellerRepresentativeService.UpdateAsync(sellerRepresentative);
+
+            return StatusCode(response.StatusCode, new { response.Message });
+        }
+        
+        [Authorize]
+        [HttpPut("responsible")]
+        public async Task<IActionResult> UpdateResponsible([FromBody] UpdateSellerRepresentativeDTO sellerRepresentative)
+        {
+            if (sellerRepresentative == null) return BadRequest("Dados inválidos.");
+
+            ResponseApi<SellerRepresentative?> response = await sellerRepresentativeService.UpdateResponsibleAsync(sellerRepresentative);
+
+            return StatusCode(response.StatusCode, new { response.Message });
+        }
+        
+        [Authorize]
+        [HttpPut("seller")]
+        public async Task<IActionResult> UpdateSeller([FromBody] UpdateSellerRepresentativeDTO sellerRepresentative)
+        {
+            if (sellerRepresentative == null) return BadRequest("Dados inválidos.");
+
+            ResponseApi<SellerRepresentative?> response = await sellerRepresentativeService.UpdateSellerAsync(sellerRepresentative);
 
             return StatusCode(response.StatusCode, new { response.Message });
         }

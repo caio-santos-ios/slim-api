@@ -22,10 +22,16 @@ namespace api_slim.src.Models
         [BsonElement("cpf")]
         public string Cpf { get; set; } = string.Empty;
 
-        [BsonElement("address")]
-        public Address Address { get; set; } = new Address();
-
         [BsonElement("notes")]
         public string Notes { get; set; } = string.Empty;
+
+        [BsonElement("type")]
+        public string Type { get; set; } = string.Empty;
+        
+        [BsonElement("parent")]
+        public string Parent { get; set; } = string.Empty;
+        
+        [BsonElement("parentId")]
+        public string ParentId { get; set; } = string.Empty;
     }
 }

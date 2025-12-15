@@ -65,5 +65,14 @@ namespace api_slim.src.Controllers
 
             return StatusCode(response.StatusCode, new { response.Message });
         }
+        
+        [Authorize]
+        [HttpDelete("table/{table}")]
+        public async Task<IActionResult> DeleteTable(string table)
+        {
+            ResponseApi<GenericTable> response = await genericTableService.DeleteByTableAsync(table);
+
+            return StatusCode(response.StatusCode, new { response.Message });
+        }
     }
 }

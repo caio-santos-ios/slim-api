@@ -7,7 +7,7 @@ using AutoMapper;
 
 namespace api_slim.src.Services
 {
-    public class ContactService(IContactRepository billingRepository, IMapper _mapper) : IContactService
+    public class ContactService(IContactRepository contactRepository, IMapper _mapper) : IContactService
 {
     #region READ
     public async Task<PaginationApi<List<dynamic>>> GetAllAsync(GetAllDTO request)
@@ -15,9 +15,9 @@ namespace api_slim.src.Services
         try
         {
             PaginationUtil<Contact> pagination = new(request.QueryParams);
-            ResponseApi<List<dynamic>> billings = await billingRepository.GetAllAsync(pagination);
-            int count = await billingRepository.GetCountDocumentsAsync(pagination);
-            return new(billings.Data, count, pagination.PageNumber, pagination.PageSize);
+            ResponseApi<List<dynamic>> contacts = await contactRepository.GetAllAsync(pagination);
+            int count = await contactRepository.GetCountDocumentsAsync(pagination);
+            return new(contacts.Data, count, pagination.PageNumber, pagination.PageSize);
         }
         catch
         {
@@ -29,9 +29,9 @@ namespace api_slim.src.Services
     {
         try
         {
-            ResponseApi<dynamic?> billing = await billingRepository.GetByIdAggregateAsync(id);
-            if(billing.Data is null) return new(null, 404, "Item não encontrado");
-            return new(billing.Data);
+            ResponseApi<dynamic?> contact = await contactRepository.GetByIdAggregateAsync(id);
+            if(contact.Data is null) return new(null, 404, "Item não encontrado");
+            return new(contact.Data);
         }
         catch
         {
@@ -45,8 +45,8 @@ namespace api_slim.src.Services
     {
         try
         {
-            Contact billing = _mapper.Map<Contact>(request);
-            ResponseApi<Contact?> response = await billingRepository.CreateAsync(billing);
+            Contact contact = _mapper.Map<Contact>(request);
+            ResponseApi<Contact?> response = await contactRepository.CreateAsync(contact);
 
             if(response.Data is null) return new(null, 400, "Falha ao criar Item.");
             return new(response.Data, 201, "Item criado com sucesso.");
@@ -63,13 +63,13 @@ namespace api_slim.src.Services
     {
         try
         {
-            ResponseApi<Contact?> billingResponse = await billingRepository.GetByIdAsync(request.Id);
-            if(billingResponse.Data is null) return new(null, 404, "Falha ao atualizar");
+            ResponseApi<Contact?> contactResponse = await contactRepository.GetByIdAsync(request.Id);
+            if(contactResponse.Data is null) return new(null, 404, "Falha ao atualizar");
             
-            Contact billing = _mapper.Map<Contact>(request);
-            billing.UpdatedAt = DateTime.UtcNow;
+            Contact contact = _mapper.Map<Contact>(request);
+            contact.UpdatedAt = DateTime.UtcNow;
 
-            ResponseApi<Contact?> response = await billingRepository.UpdateAsync(billing);
+            ResponseApi<Contact?> response = await contactRepository.UpdateAsync(contact);
             if(!response.IsSuccess) return new(null, 400, "Falha ao atualizar");
             return new(response.Data, 201, "Atualizado com sucesso");
         }
@@ -85,9 +85,9 @@ namespace api_slim.src.Services
     {
         try
         {
-            ResponseApi<Contact> billing = await billingRepository.DeleteAsync(id);
-            if(!billing.IsSuccess) return new(null, 400, billing.Message);
-            return billing;
+            ResponseApi<Contact> contact = await contactRepository.DeleteAsync(id);
+            if(!contact.IsSuccess) return new(null, 400, contact.Message);
+            return new(null, 204, "Excluído com sucesso");
         }
         catch
         {

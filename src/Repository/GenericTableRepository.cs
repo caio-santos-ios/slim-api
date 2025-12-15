@@ -118,7 +118,8 @@ namespace api_slim.src.Repository
                 BsonDocument[] pipeline = [
                     new("$match", new BsonDocument{
                         {"table", table},
-                        {"deleted", false}
+                        {"deleted", false},
+                        {"active", true}
                     }),
                     new("$project", new BsonDocument
                     {
@@ -254,6 +255,26 @@ namespace api_slim.src.Repository
                 await context.GenericTables.ReplaceOneAsync(x => x.Id == userId, genericTable);
 
                 return new(genericTable, 204, "Tabela Genérica excluído com sucesso");
+            }
+            catch
+            {
+                return new(null, 500, "Falha ao excluír Tabela Genérica");
+            }
+        }
+        public async Task<ResponseApi<GenericTable>> DeleteByTableAsync(string table)
+        {
+            try
+            {
+                List<GenericTable> genericTables = await context.GenericTables.Find(x => x.Table == table && !x.Deleted).ToListAsync();
+                foreach (GenericTable genericTable in genericTables)
+                {
+                    genericTable.Deleted = true;
+                    genericTable.DeletedAt = DateTime.UtcNow;
+
+                    await context.GenericTables.ReplaceOneAsync(x => x.Id == genericTable.Id, genericTable);
+                }
+
+                return new(null, 204, "Tabela Genérica excluído com sucesso");
             }
             catch
             {

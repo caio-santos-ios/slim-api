@@ -17,6 +17,6 @@ namespace api_slim.src.Models.Base
         public DateTime UpdatedAt {get;set;} = DateTime.UtcNow;
         
         [BsonElement("deletedAt")]
-        public DateTime DeletedAt {get;set;} = DateTime.UtcNow;
+        public DateTime? DeletedAt {get;set;}
     }
 }

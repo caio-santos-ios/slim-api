@@ -14,6 +14,6 @@ public class UpdateBillingDTO
         
         public string DeliveryDate { get; set; } = string.Empty;
 
-        public string BillingDateValue { get; set; } = string.Empty;
+        public string BillingDate { get; set; } = string.Empty;
 }
 }

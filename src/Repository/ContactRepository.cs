@@ -22,13 +22,70 @@ namespace api_slim.src.Repository
                 new("$sort", pagination.PipelineSort),
                 new("$skip", pagination.Skip),
                 new("$limit", pagination.Limit),
+
+                new BsonDocument("$lookup", new BsonDocument
+                {
+                    { "from", "generic_tables" }, 
+                    { "let", new BsonDocument("department", "$department") },
+                    { "pipeline", new BsonArray
+                        {
+                            new BsonDocument("$match", new BsonDocument
+                            {
+                                { "$expr", new BsonDocument("$and", new BsonArray
+                                    {
+                                        new BsonDocument("$eq", new BsonArray { "$code", "$$department" }),
+                                        new BsonDocument("$eq", new BsonArray { "$table", "departamento-contato-representante" })
+                                    })
+                                }
+                            })
+                        }
+                    },
+                    { "as", "_department" } 
+                }),
+
+                new BsonDocument("$unwind", new BsonDocument
+                {
+                    { "path", "$_department" },
+                    { "preserveNullAndEmptyArrays", true }
+                }),
+                
+                new BsonDocument("$lookup", new BsonDocument
+                {
+                    { "from", "generic_tables" }, 
+                    { "let", new BsonDocument("position", "$position") },
+                    { "pipeline", new BsonArray
+                        {
+                            new BsonDocument("$match", new BsonDocument
+                            {
+                                { "$expr", new BsonDocument("$and", new BsonArray
+                                    {
+                                        new BsonDocument("$eq", new BsonArray { "$code", "$$position" }),
+                                        new BsonDocument("$eq", new BsonArray { "$table", "funcao-contato-representante" })
+                                    })
+                                }
+                            })
+                        }
+                    },
+                    { "as", "_position" } 
+                }),
+
+                new BsonDocument("$unwind", new BsonDocument
+                {
+                    { "path", "$_position" },
+                    { "preserveNullAndEmptyArrays", true }
+                }),
+
                 new("$addFields", new BsonDocument
                 {
                     {"id", new BsonDocument("$toString", "$_id")},
+                    {"departmentDescription", "$_department.description"},
+                    {"positionDescription", "$_position.description"}
                 }),
                 new("$project", new BsonDocument
                 {
                     {"_id", 0}, 
+                    {"_department", 0}, 
+                    {"_position", 0} 
                 }),
                 new("$sort", pagination.PipelineSort),
             };

@@ -28,6 +28,14 @@ namespace api_slim.src.Controllers
         }
         
         [Authorize]
+        [HttpGet("{parentId}/{parent}")]
+        public async Task<IActionResult> GetByParentId(string parentId, string parent)
+        {
+            ResponseApi<Address?> response = await addressService.GetByParentIdAsync(parentId, parent);
+            return StatusCode(response.StatusCode, new { response.Message, response.Result });
+        }
+        
+        [Authorize]
         [HttpPost]
         public async Task<IActionResult> Create([FromBody] CreateAddressDTO address)
         {

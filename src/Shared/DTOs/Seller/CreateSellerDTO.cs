@@ -15,5 +15,8 @@ public class CreateSellerDTO
         public Address Address { get; set; } = new Address();
 
         public string Notes { get; set; } = string.Empty;
+        public string Type { get; set; } = string.Empty;
+        public string Parent { get; set; } = string.Empty;
+        public string ParentId { get; set; } = string.Empty;
 }
 }

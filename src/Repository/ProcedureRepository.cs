@@ -22,9 +22,26 @@ namespace api_slim.src.Repository
                 new("$sort", pagination.PipelineSort),
                 new("$skip", pagination.Skip),
                 new("$limit", pagination.Limit),
+                new BsonDocument("$lookup", new BsonDocument
+                {
+                    { "from", "service_modules" },
+                    { "let", new BsonDocument("registrationId", new BsonDocument("$toObjectId", "$serviceModuleId")) },
+                    { "pipeline", new BsonArray
+                        {
+                            new BsonDocument("$match", new BsonDocument
+                            {
+                                { "$expr", new BsonDocument("$eq", new BsonArray { "$_id", "$$registrationId" }) }
+                            })
+                        }
+                    },
+                    { "as", "_service_module" }
+                }),
+                new BsonDocument("$unwind", "$_service_module"),
+
                 new("$addFields", new BsonDocument
                 {
                     {"id", new BsonDocument("$toString", "$_id")},
+                    {"serviceModule", new BsonDocument("$ifNull", new BsonArray { "$_service_module.name", "" })},
                 }),
                 new("$project", new BsonDocument
                 {
@@ -81,6 +98,19 @@ namespace api_slim.src.Repository
         catch
         {
             return new(null, 500, "Falha ao buscar Procedimento");
+        }
+    }
+    
+    public async Task<ResponseApi<long>> GetNextCodeAsync()
+    {
+        try
+        {
+            long count = await context.Procedures.Find(x => true).CountDocumentsAsync();
+            return new(count);
+        }
+        catch
+        {
+            return new(0, 500, "Falha ao buscar Procedimento");
         }
     }
     

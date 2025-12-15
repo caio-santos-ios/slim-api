@@ -46,6 +46,9 @@ namespace api_slim.src.Services
         try
         {
             Procedure procedure = _mapper.Map<Procedure>(request);
+            
+            ResponseApi<long> code = await procedureRepository.GetNextCodeAsync();
+            procedure.Code = code.Data.ToString().PadLeft(6, '0');
             ResponseApi<Procedure?> response = await procedureRepository.CreateAsync(procedure);
 
             if(response.Data is null) return new(null, 400, "Falha ao criar Procedimento.");
@@ -87,7 +90,7 @@ namespace api_slim.src.Services
         {
             ResponseApi<Procedure> procedure = await procedureRepository.DeleteAsync(id);
             if(!procedure.IsSuccess) return new(null, 400, procedure.Message);
-            return procedure;
+            return new(null, 204, "Excluído com sucesso");
         }
         catch
         {

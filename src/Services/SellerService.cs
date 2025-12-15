@@ -7,7 +7,7 @@ using AutoMapper;
 
 namespace api_slim.src.Services
 {
-    public class SellerService(ISellerRepository sellerRepository, IMapper _mapper) : ISellerService
+    public class SellerService(ISellerRepository sellerRepository, IAddressRepository addressRepository, IMapper _mapper) : ISellerService
 {
     #region READ
     public async Task<PaginationApi<List<dynamic>>> GetAllAsync(GetAllDTO request)
@@ -48,6 +48,13 @@ namespace api_slim.src.Services
             Seller seller = _mapper.Map<Seller>(request);
             ResponseApi<Seller?> response = await sellerRepository.CreateAsync(seller);
 
+            request.Address.Parent = "seller";
+            request.Address.ParentId = response.Data!.Id;
+
+            Address address = _mapper.Map<Address>(request.Address);
+            ResponseApi<Address?> addressResponse = await addressRepository.CreateAsync(address);
+            if(!addressResponse.IsSuccess) return new(null, 400, "Falha ao criar Vendedor.");
+
             if(response.Data is null) return new(null, 400, "Falha ao criar Vendedor.");
             return new(response.Data, 201, "Vendedor criado com sucesso.");
         }
@@ -71,6 +78,10 @@ namespace api_slim.src.Services
 
             ResponseApi<Seller?> response = await sellerRepository.UpdateAsync(seller);
             if(!response.IsSuccess) return new(null, 400, "Falha ao atualizar");
+
+            ResponseApi<Address?> addressResponse = await addressRepository.UpdateAsync(request.Address);
+            if(!addressResponse.IsSuccess) return new(null, 400, "Falha ao atualizar Vendedor.");
+
             return new(response.Data, 201, "Atualizado com sucesso");
         }
         catch
@@ -87,7 +98,7 @@ namespace api_slim.src.Services
         {
             ResponseApi<Seller> seller = await sellerRepository.DeleteAsync(id);
             if(!seller.IsSuccess) return new(null, 400, seller.Message);
-            return seller;
+            return new(null, 204, "Excluído com sucesso");
         }
         catch
         {

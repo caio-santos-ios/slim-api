@@ -15,5 +15,6 @@ namespace api_slim.src.Interfaces
         Task<ResponseApi<GenericTable?>> CreateAsync(GenericTable user);
         Task<ResponseApi<GenericTable?>> UpdateAsync(GenericTable request);
         Task<ResponseApi<GenericTable>> DeleteAsync(string id);
+        Task<ResponseApi<GenericTable>> DeleteByTableAsync(string table);
     }
 }

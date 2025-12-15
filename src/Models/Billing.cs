@@ -26,6 +26,6 @@ namespace api_slim.src.Models
         public string DeliveryDate { get; set; } = string.Empty;
 
         [BsonElement("billingDate")]
-        public string BillingDateValue { get; set; } = string.Empty;
+        public string BillingDate { get; set; } = string.Empty;
     }
 }

@@ -44,7 +44,9 @@ namespace api_slim.src.Configuration
             
             CreateMap<CreateProfessionalDTO, Professional>().ReverseMap();
             CreateMap<UpdateProfessionalDTO, Professional>().ReverseMap();      
-            
+
+            CreateMap<CreateAttachmentDTO, Attachment>().ReverseMap();
+            CreateMap<UpdateAttachmentDTO, Attachment>().ReverseMap();      
             #endregion
 
             CreateMap<CreateAccountsReceivableDTO, AccountsReceivable>().ReverseMap();

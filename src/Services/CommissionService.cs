@@ -87,7 +87,7 @@ namespace api_slim.src.Services
         {
             ResponseApi<Commission> commission = await commissionRepository.DeleteAsync(id);
             if(!commission.IsSuccess) return new(null, 400, commission.Message);
-            return commission;
+            return new(null, 204, "Excluído com sucesso");
         }
         catch
         {

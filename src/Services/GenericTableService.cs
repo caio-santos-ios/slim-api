@@ -103,7 +103,20 @@ namespace api_slim.src.Services
             {
                 ResponseApi<GenericTable> genericTable = await genericTableRepository.DeleteAsync(genericTableId);
                 if(!genericTable.IsSuccess) return new(null, 400, genericTable.Message);
-                return genericTable;
+                return new(null, 204, "Excluído com sucesso");
+            }
+            catch
+            {
+                return new(null, 500, "Ocorreu um erro inesperado. Por favor, tente novamente mais tarde.");
+            }
+        }
+        public async Task<ResponseApi<GenericTable>> DeleteByTableAsync(string table)
+        {
+            try
+            {
+                ResponseApi<GenericTable> genericTable = await genericTableRepository.DeleteByTableAsync(table);
+                if(!genericTable.IsSuccess) return new(null, 400, genericTable.Message);
+                return new(null, 204, "Excluído com sucesso");
             }
             catch
             {

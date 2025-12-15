@@ -47,7 +47,6 @@ builder.Services.AddCors(options =>
     options.AddPolicy(name: ProductionCorsPolicy, policy =>
     {
         policy.AllowAnyOrigin()
-        // policy.WithOrigins("http://localhost:3000")
               .AllowAnyHeader()
               .AllowAnyMethod();
     });
@@ -63,23 +62,22 @@ builder.Services.AddCors(options =>
 builder.Services.AddAuthorization();
 
 var app = builder.Build();
+
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
     app.UseSwaggerUI();
 }
 
+app.UseHttpsRedirection();
 
-if (app.Environment.IsDevelopment())
-{
-    app.UseHttpsRedirection();
-    app.UseCors(DevelopmentCorsPolicy);
-}
-else
-{
-    app.UseCors(ProductionCorsPolicy);
-}
+app.UseCors(
+    app.Environment.IsDevelopment()
+        ? DevelopmentCorsPolicy
+        : ProductionCorsPolicy
+);
 
+app.UseStaticFiles();
 app.UseAuthentication();
 app.UseAuthorization();
 app.MapControllers();

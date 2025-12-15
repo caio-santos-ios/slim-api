@@ -10,8 +10,10 @@ public class CreateProcedureDTO
 
         public string ServiceModuleId { get; set; } = string.Empty;
 
-        public List<string> ExternalCodes { get; set; } = new List<string>();
+        public string ExternalCodes { get; set; } = string.Empty;
 
         public string Notes { get; set; } = string.Empty;
+                public bool Active {get;set;}
+
 }
 }
