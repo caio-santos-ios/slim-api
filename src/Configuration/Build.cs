@@ -90,6 +90,10 @@ namespace api_slim.src.Configuration
             builder.Services.AddTransient<IProfessionalRepository, ProfessionalRepository>();                  
             builder.Services.AddTransient<IAttachmentService, AttachmentService>();
             builder.Services.AddTransient<IAttachmentRepository, AttachmentRepository>();                  
+            builder.Services.AddTransient<ICustomerService, CustomerService>();
+            builder.Services.AddTransient<ICustomerRepository, CustomerRepository>();                  
+            builder.Services.AddTransient<ICustomerRecipientService, CustomerRecipientService>();
+            builder.Services.AddTransient<ICustomerRecipientRepository, CustomerRecipientRepository>();                  
 
             // Handlers
             builder.Services.AddTransient<SmsHandler>();

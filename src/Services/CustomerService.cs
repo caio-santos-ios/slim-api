@@ -1,0 +1,153 @@
+using api_slim.src.Interfaces;
+using api_slim.src.Models;
+using api_slim.src.Models.Base;
+using api_slim.src.Shared.DTOs;
+using api_slim.src.Shared.Utils;
+using AutoMapper;
+
+namespace api_slim.src.Services
+{
+    public class CustomerService(ICustomerRepository customerRepository, IAddressRepository addressRepository, ICustomerRecipientService customerRecipientService, IMapper _mapper) : ICustomerService
+{
+    #region READ
+    public async Task<PaginationApi<List<dynamic>>> GetAllAsync(GetAllDTO request)
+    {
+        try
+        {
+            PaginationUtil<Customer> pagination = new(request.QueryParams);
+            ResponseApi<List<dynamic>> customers = await customerRepository.GetAllAsync(pagination);
+            int count = await customerRepository.GetCountDocumentsAsync(pagination);
+            return new(customers.Data, count, pagination.PageNumber, pagination.PageSize);
+        }
+        catch
+        {
+            return new(null, 500, "Ocorreu um erro inesperado. Por favor, tente novamente mais tarde.");
+        }
+    }
+    
+    public async Task<ResponseApi<dynamic?>> GetByIdAggregateAsync(string id)
+    {
+        try
+        {
+            ResponseApi<dynamic?> customer = await customerRepository.GetByIdAggregateAsync(id);
+            if(customer.Data is null) return new(null, 404, "Cliente não encontrado");
+            return new(customer.Data);
+        }
+        catch
+        {
+            return new(null, 500, "Ocorreu um erro inesperado. Por favor, tente novamente mais tarde.");
+        }
+    }
+    #endregion
+    
+    #region CREATE
+    public async Task<ResponseApi<Customer?>> CreateAsync(CreateCustomerDTO request)
+    {
+        try
+        {
+            Customer customer = _mapper.Map<Customer>(request);
+            
+            ResponseApi<Customer?> response = await customerRepository.CreateAsync(customer);
+
+            if(response.Data is null) return new(null, 400, "Falha ao criar Cliente.");
+
+            Address address = _mapper.Map<Address>(request.Address);
+            address.Parent = "customer-contract";
+            address.ParentId = response.Data!.Id;
+            ResponseApi<Address?> addressResponse = await addressRepository.CreateAsync(address);
+            if(!addressResponse.IsSuccess) return new(null, 400, "Falha ao criar Item.");
+
+            switch(request.TypePlan)
+            {
+                case "Individual":
+                case "Familiar":
+                    await customerRecipientService.CreateAsync(new ()
+                    {
+                        Address = request.Address,
+                        DocumentContract = request.Document,
+                        Name = request.CorporateName,
+                        Cpf = request.Document,
+                        Rg = request.Rg,
+                        DateOfBirth = request.DateOfBirth,
+                        Gender = request.Gender,
+                        Phone = request.Phone,
+                        Whatsapp = request.Whatsapp,
+                        Email = request.Email,
+                        Notes = request.Notes,
+                        PlanId = ""
+                    });
+                    break;
+
+                case "Concessão":
+                case "Concessão - Familia":
+                    break;
+            }
+
+            return new(response.Data, 201, "Cliente criado com sucesso.");
+        }
+        catch
+        { 
+            return new(null, 500, $"Ocorreu um erro inesperado. Por favor, tente novamente mais tarde");
+        }
+    }
+    #endregion
+    
+    #region UPDATE
+    public async Task<ResponseApi<Customer?>> UpdateAsync(UpdateCustomerDTO request)
+    {
+        try
+        {
+            ResponseApi<Customer?> customerResponse = await customerRepository.GetByIdAsync(request.Id);
+            if(customerResponse.Data is null) return new(null, 404, "Falha ao atualizar");
+            
+            Customer customer = _mapper.Map<Customer>(request);
+            customer.UpdatedAt = DateTime.UtcNow;
+
+            ResponseApi<Customer?> response = await customerRepository.UpdateAsync(customer);
+            if(!response.IsSuccess) return new(null, 400, "Falha ao atualizar");
+
+            if(!string.IsNullOrEmpty(request.Address.Id))
+            {
+                ResponseApi<Address?> findAddress = await addressRepository.GetByParentIdAsync(request.Address.ParentId, request.Address.Parent);
+                if(!findAddress.IsSuccess || findAddress.Data is null) return new(null, 400, "Falha ao atualizar.");
+                
+                request.Address.Id = findAddress.Data.Id;
+            
+                ResponseApi<Address?> addressResponse = await addressRepository.UpdateAsync(request.Address);
+                if(!addressResponse.IsSuccess) return new(null, 400, "Falha ao atualizar.");
+            }
+            else
+            {
+                Address address = _mapper.Map<Address>(request.Address);
+                address.Parent = "customer-contract";
+                address.ParentId = response.Data!.Id;
+                ResponseApi<Address?> addressResponse = await addressRepository.CreateAsync(address);
+                if(!addressResponse.IsSuccess) return new(null, 400, "Falha ao criar Item.");
+            };
+            
+            return new(response.Data, 201, "Atualizado com sucesso");
+        }
+        catch
+        {
+            return new(null, 500, "Ocorreu um erro inesperado. Por favor, tente novamente mais tarde.");
+        }
+    }
+    #endregion
+    
+    #region DELETE
+    public async Task<ResponseApi<Customer>> DeleteAsync(string id)
+    {
+        try
+        {
+            ResponseApi<Customer> customer = await customerRepository.DeleteAsync(id);
+            if(!customer.IsSuccess) return new(null, 400, customer.Message);
+            return new(null, 204, "Excluído com sucesso");
+        }
+        catch
+        {
+            return new(null, 500, "Ocorreu um erro inesperado. Por favor, tente novamente mais tarde.");
+        }
+    }
+    #endregion 
+}
+}
