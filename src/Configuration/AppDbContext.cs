@@ -89,6 +89,14 @@ namespace api_slim.src.Configuration
         {
             get { return Database.GetCollection<Attachment>("attachments"); }
         }
+        public IMongoCollection<Customer> Customers
+        {
+            get { return Database.GetCollection<Customer>("customers"); }
+        }
+        public IMongoCollection<CustomerRecipient> CustomerRecipients
+        {
+            get { return Database.GetCollection<CustomerRecipient>("customer_recipients"); }
+        }
         #endregion
 
         #region FIN

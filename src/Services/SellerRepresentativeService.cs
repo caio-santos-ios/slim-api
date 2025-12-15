@@ -101,8 +101,7 @@ namespace api_slim.src.Services
                 address.ParentId = response.Data!.Id;
                 ResponseApi<Address?> addressResponse = await addressRepository.CreateAsync(address);
                 if(!addressResponse.IsSuccess) return new(null, 400, "Falha ao criar Item.");
-            };
-            
+            };            
 
             return new(response.Data, 200, "Atualizado com sucesso");
         }

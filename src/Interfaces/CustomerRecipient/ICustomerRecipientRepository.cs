@@ -1,0 +1,17 @@
+using api_slim.src.Models;
+using api_slim.src.Models.Base;
+using api_slim.src.Shared.Utils;
+
+namespace api_slim.src.Interfaces
+{
+public interface ICustomerRecipientRepository
+{
+    Task<ResponseApi<List<dynamic>>> GetAllAsync(PaginationUtil<CustomerRecipient> pagination);
+    Task<ResponseApi<dynamic?>> GetByIdAggregateAsync(string id);
+    Task<ResponseApi<CustomerRecipient?>> GetByIdAsync(string id);
+    Task<int> GetCountDocumentsAsync(PaginationUtil<CustomerRecipient> pagination);
+    Task<ResponseApi<CustomerRecipient?>> CreateAsync(CustomerRecipient address);
+    Task<ResponseApi<CustomerRecipient?>> UpdateAsync(CustomerRecipient address);
+    Task<ResponseApi<CustomerRecipient>> DeleteAsync(string id);
+}
+}
