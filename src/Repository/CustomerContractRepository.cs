@@ -9,10 +9,10 @@ using MongoDB.Driver;
 
 namespace api_slim.src.Repository
 {
-    public class CustomerRecipientRepository(AppDbContext context) : ICustomerRecipientRepository
+    public class CustomerContractRepository(AppDbContext context) : ICustomerContractRepository
 {
     #region READ
-    public async Task<ResponseApi<List<dynamic>>> GetAllAsync(PaginationUtil<CustomerRecipient> pagination)
+    public async Task<ResponseApi<List<dynamic>>> GetAllAsync(PaginationUtil<CustomerContract> pagination)
     {
         try
         {
@@ -87,22 +87,27 @@ namespace api_slim.src.Repository
 
                 new BsonDocument("$lookup", new BsonDocument
                 {
-                    { "from", "plans" },
-                    { "let", new BsonDocument("registrationId", new BsonDocument("$toObjectId", "$planId")) },
+                    { "from", "generic_tables" }, 
+                    { "let", new BsonDocument("category", "$category") },
                     { "pipeline", new BsonArray
                         {
                             new BsonDocument("$match", new BsonDocument
                             {
-                                { "$expr", new BsonDocument("$eq", new BsonArray { "$_id", "$$registrationId" }) }
+                                { "$expr", new BsonDocument("$and", new BsonArray
+                                    {
+                                        new BsonDocument("$eq", new BsonArray { "$code", "$$category" }),
+                                        new BsonDocument("$eq", new BsonArray { "$table", "categoria-contrato-cliente" })
+                                    })
+                                }
                             })
                         }
                     },
-                    { "as", "_plan" }
+                    { "as", "_category" } 
                 }),
 
                 new BsonDocument("$unwind", new BsonDocument
                 {
-                    { "path", "$_plan" },
+                    { "path", "$_category" },
                     { "preserveNullAndEmptyArrays", true }
                 }),
 
@@ -124,13 +129,14 @@ namespace api_slim.src.Repository
                         }
                     },
                     {"genderDescription", new BsonDocument("$ifNull", new BsonArray { "$_gender.description", "" })},
-                    {"serviceModuleId", new BsonDocument("$ifNull", new BsonArray { "$_plan.serviceModuleId", "" })}
+                    {"categoryDescription", new BsonDocument("$ifNull", new BsonArray { "$_category.description", "" })},
                 }),
                 new("$project", new BsonDocument
                 {
                     {"_id", 0}, 
                     {"_address", 0}, 
                     {"_gender", 0}, 
+                    {"_category", 0}
                 }),
                 new("$sort", pagination.PipelineSort),
                 new("$skip", pagination.Skip),
@@ -138,13 +144,13 @@ namespace api_slim.src.Repository
 
             };
 
-            List<BsonDocument> results = await context.CustomerRecipients.Aggregate<BsonDocument>(pipeline).ToListAsync();
+            List<BsonDocument> results = await context.CustomerContracts.Aggregate<BsonDocument>(pipeline).ToListAsync();
             List<dynamic> list = results.Select(doc => BsonSerializer.Deserialize<dynamic>(doc)).ToList();
             return new(list);
         }
         catch
         {
-            return new(null, 500, "Falha ao buscar Beneficiário");
+            return new(null, 500, "Falha ao buscar Contrato");
         }
     }
     
@@ -166,30 +172,42 @@ namespace api_slim.src.Repository
                 }),
             ];
 
-            BsonDocument? response = await context.CustomerRecipients.Aggregate<BsonDocument>(pipeline).FirstOrDefaultAsync();
+            BsonDocument? response = await context.CustomerContracts.Aggregate<BsonDocument>(pipeline).FirstOrDefaultAsync();
             dynamic? result = response is null ? null : BsonSerializer.Deserialize<dynamic>(response);
-            return result is null ? new(null, 404, "Beneficiário não encontrado") : new(result);
+            return result is null ? new(null, 404, "Contrato não encontrado") : new(result);
         }
         catch
         {
-            return new(null, 500, "Falha ao buscar Beneficiário");
+            return new(null, 500, "Falha ao buscar Contrato");
         }
     }
     
-    public async Task<ResponseApi<CustomerRecipient?>> GetByIdAsync(string id)
+    public async Task<ResponseApi<CustomerContract?>> GetByIdAsync(string id)
     {
         try
         {
-            CustomerRecipient? customerRecipient = await context.CustomerRecipients.Find(x => x.Id == id && !x.Deleted).FirstOrDefaultAsync();
+            CustomerContract? customerRecipient = await context.CustomerContracts.Find(x => x.Id == id && !x.Deleted).FirstOrDefaultAsync();
             return new(customerRecipient);
         }
         catch
         {
-            return new(null, 500, "Falha ao buscar Beneficiário");
+            return new(null, 500, "Falha ao buscar Contrato");
+        }
+    }
+    public async Task<ResponseApi<long>> GetNextCodeAsync()
+    {
+        try
+        {
+            long count = await context.CustomerContracts.Find(x => true).CountDocumentsAsync();
+            return new(count);
+        }
+        catch
+        {
+            return new(0, 500, "Falha ao buscar novo código");
         }
     }
     
-    public async Task<int> GetCountDocumentsAsync(PaginationUtil<CustomerRecipient> pagination)
+    public async Task<int> GetCountDocumentsAsync(PaginationUtil<CustomerContract> pagination)
     {
         List<BsonDocument> pipeline = new()
         {
@@ -206,60 +224,60 @@ namespace api_slim.src.Repository
             new("$sort", pagination.PipelineSort),
         };
 
-        List<BsonDocument> results = await context.CustomerRecipients.Aggregate<BsonDocument>(pipeline).ToListAsync();
+        List<BsonDocument> results = await context.CustomerContracts.Aggregate<BsonDocument>(pipeline).ToListAsync();
         return results.Select(doc => BsonSerializer.Deserialize<dynamic>(doc)).Count();
     }
     #endregion
     
     #region CREATE
-    public async Task<ResponseApi<CustomerRecipient?>> CreateAsync(CustomerRecipient customerRecipient)
+    public async Task<ResponseApi<CustomerContract?>> CreateAsync(CustomerContract customerRecipient)
     {
         try
         {
-            await context.CustomerRecipients.InsertOneAsync(customerRecipient);
+            await context.CustomerContracts.InsertOneAsync(customerRecipient);
 
-            return new(customerRecipient, 201, "Beneficiário criado com sucesso");
+            return new(customerRecipient, 201, "Contrato criado com sucesso");
         }
         catch
         {
-            return new(null, 500, "Falha ao criar Beneficiário");  
+            return new(null, 500, "Falha ao criar Contrato");  
         }
     }
     #endregion
     
     #region UPDATE
-    public async Task<ResponseApi<CustomerRecipient?>> UpdateAsync(CustomerRecipient customerRecipient)
+    public async Task<ResponseApi<CustomerContract?>> UpdateAsync(CustomerContract customerRecipient)
     {
         try
         {
-            await context.CustomerRecipients.ReplaceOneAsync(x => x.Id == customerRecipient.Id, customerRecipient);
+            await context.CustomerContracts.ReplaceOneAsync(x => x.Id == customerRecipient.Id, customerRecipient);
 
-            return new(customerRecipient, 201, "Beneficiário atualizado com sucesso");
+            return new(customerRecipient, 201, "Contrato atualizado com sucesso");
         }
         catch
         {
-            return new(null, 500, "Falha ao atualizar Beneficiário");
+            return new(null, 500, "Falha ao atualizar Contrato");
         }
     }
     #endregion
     
     #region DELETE
-    public async Task<ResponseApi<CustomerRecipient>> DeleteAsync(string id)
+    public async Task<ResponseApi<CustomerContract>> DeleteAsync(string id)
     {
         try
         {
-            CustomerRecipient? customerRecipient = await context.CustomerRecipients.Find(x => x.Id == id && !x.Deleted).FirstOrDefaultAsync();
-            if(customerRecipient is null) return new(null, 404, "Beneficiário não encontrado");
+            CustomerContract? customerRecipient = await context.CustomerContracts.Find(x => x.Id == id && !x.Deleted).FirstOrDefaultAsync();
+            if(customerRecipient is null) return new(null, 404, "Contrato não encontrado");
             customerRecipient.Deleted = true;
             customerRecipient.DeletedAt = DateTime.UtcNow;
 
-            await context.CustomerRecipients.ReplaceOneAsync(x => x.Id == id, customerRecipient);
+            await context.CustomerContracts.ReplaceOneAsync(x => x.Id == id, customerRecipient);
 
-            return new(customerRecipient, 204, "Beneficiário excluído com sucesso");
+            return new(customerRecipient, 204, "Contrato excluído com sucesso");
         }
         catch
         {
-            return new(null, 500, "Falha ao excluír Beneficiário");
+            return new(null, 500, "Falha ao excluír Contrato");
         }
     }
     #endregion

@@ -137,6 +137,16 @@ namespace api_slim.src.Shared.Utils
 
                         default:
                             BsonDocument valueString = comparison.Equals("$regex") ? new BsonDocument { { "$regex", value }, { "$options", "i" } } : new BsonDocument(comparison, value);
+                            
+                            if(comparison == "$in")
+                            {
+                                BsonArray list = new(
+                                    value
+                                        .Split(',', StringSplitOptions.RemoveEmptyEntries)
+                                        .Select(v => (BsonValue)v.Trim())
+                                );
+                                valueString = new BsonDocument("$in", list);
+                            }
 
                             if (logic == "and")
                             {

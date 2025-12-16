@@ -3,8 +3,8 @@ using MongoDB.Bson;
 using MongoDB.Bson.Serialization.Attributes;
 
 namespace api_slim.src.Models
-{    
-    public class CustomerContractor : ModelBase
+{
+    public class CustomerContract : ModelBase
     {
         [BsonId]
         [BsonRepresentation(BsonType.ObjectId)]
@@ -13,6 +13,9 @@ namespace api_slim.src.Models
         [BsonElement("code")]
         public string Code { get; set; } = string.Empty;
 
+        [BsonElement("contractorId")]
+        public string ContractorId { get; set; } = string.Empty; 
+
         [BsonElement("type")]
         public string Type { get; set; } = string.Empty;
 
@@ -20,7 +23,7 @@ namespace api_slim.src.Models
         public string Name { get; set; } = string.Empty;
 
         [BsonElement("saleDate")]
-        public string SaleDate { get; set; } = string.Empty;
+        public DateTime? SaleDate { get; set; }
 
         [BsonElement("category")]
         public string Category { get; set; } = string.Empty;
@@ -30,9 +33,12 @@ namespace api_slim.src.Models
 
         [BsonElement("sellerId")]
         public string SellerId { get; set; } = string.Empty;
+     
+        [BsonElement("serviceModuleId")]
+        public string ServiceModuleId { get; set; } = string.Empty;
 
         [BsonElement("value")]
-        public string Value { get; set; } = string.Empty;
+        public decimal Value { get; set; }
 
         [BsonElement("paymentMethod")]
         public string PaymentMethod { get; set; } = string.Empty;
@@ -58,11 +64,11 @@ namespace api_slim.src.Models
         [BsonElement("recurrence")]
         public string Recurrence { get; set; } = string.Empty;
 
-        [BsonElement("endRecurrence")]
-        public string EndRecurrence { get; set; } = string.Empty;
+        [BsonElement("recurrencePeriod")]
+        public DateTime? RecurrencePeriod { get; set; }
 
         [BsonElement("dueDate")]
-        public string DueDate { get; set; } = string.Empty;
+        public DateTime? DueDate { get; set; }
 
         [BsonElement("billingPeriod")]
         public string BillingPeriod { get; set; } = string.Empty;
@@ -72,5 +78,5 @@ namespace api_slim.src.Models
 
         [BsonElement("notes")]
         public string Notes { get; set; } = string.Empty;
-    } 
+    }
 }
