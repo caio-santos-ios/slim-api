@@ -10,7 +10,7 @@ namespace api_slim.src.Shared.DTOs
                 public string Cpf { get; set; } = string.Empty; // Mapeado do campo "CPF"
                 public string Rg { get; set; } = string.Empty; // Mapeado do campo "RG"
                 public Address Address { get; set; } = new Address();
-                public DateTime DateOfBirth { get; set; } // Mapeado do campo "Data de Nascimento"
+                public DateTime? DateOfBirth { get; set; } // Mapeado do campo "Data de Nascimento"
                 public string Gender { get; set; } = string.Empty; // Mapeado do campo "Gênero"
                 public string Phone { get; set; } = string.Empty; // Mapeado do campo "Telefone"
                 public string Whatsapp { get; set; } = string.Empty; // Mapeado do campo "Whatsapp"

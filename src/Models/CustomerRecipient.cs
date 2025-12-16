@@ -26,7 +26,7 @@ namespace api_slim.src.Models
         public string Rg { get; set; } = string.Empty; // Mapeado do campo "RG"
 
         [BsonElement("dateOfBirth")]
-        public DateTime DateOfBirth { get; set; } // Mapeado do campo "Data de Nascimento"
+        public DateTime? DateOfBirth { get; set; } // Mapeado do campo "Data de Nascimento"
 
         [BsonElement("gender")]
         public string Gender { get; set; } = string.Empty; // Mapeado do campo "Gênero"

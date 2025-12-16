@@ -94,6 +94,8 @@ namespace api_slim.src.Configuration
             builder.Services.AddTransient<ICustomerRepository, CustomerRepository>();                  
             builder.Services.AddTransient<ICustomerRecipientService, CustomerRecipientService>();
             builder.Services.AddTransient<ICustomerRecipientRepository, CustomerRecipientRepository>();                  
+            builder.Services.AddTransient<ICustomerContractService, CustomerContractService>();
+            builder.Services.AddTransient<ICustomerContractRepository, CustomerContractRepository>();                  
 
             // Handlers
             builder.Services.AddTransient<SmsHandler>();

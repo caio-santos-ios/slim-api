@@ -42,6 +42,7 @@ namespace api_slim.src.Repository
                 new("$addFields", new BsonDocument
                 {
                     {"id", new BsonDocument("$toString", "$_id")},
+                    {"serviceModuleId", new BsonDocument("$ifNull", new BsonArray { new BsonDocument("$toString", "$_service_module._id"), "" })},
                     {"serviceModule", new BsonDocument("$ifNull", new BsonArray { "$_service_module.name", "" })},
                 }),
                 new("$project", new BsonDocument
