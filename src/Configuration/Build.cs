@@ -47,6 +47,7 @@ namespace api_slim.src.Configuration
                     ValidateIssuerSigningKey = true,
                     ValidIssuer = Issuer,
                     ValidAudience = Audience,
+                    ClockSkew = TimeSpan.FromMinutes(5),
                     IssuerSigningKey = new SymmetricSecurityKey(
                         Encoding.UTF8.GetBytes(SecretKey)
                     )
