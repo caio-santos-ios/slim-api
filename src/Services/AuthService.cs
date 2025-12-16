@@ -221,7 +221,7 @@ namespace api_slim.src.Services
                 issuer: Issuer,
                 audience: Audience,
                 claims: claims,
-                expires: refresh ? DateTime.UtcNow.AddDays(7) : DateTime.UtcNow.AddDays(1),
+                expires: refresh ? DateTime.UtcNow.AddDays(7) : DateTime.UtcNow.AddDays(2),
                 signingCredentials: creds
             );
 
