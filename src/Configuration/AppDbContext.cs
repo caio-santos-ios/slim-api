@@ -26,9 +26,9 @@ namespace api_slim.src.Configuration
                 var mongoClient = new MongoClient(mongoClientSettings);
                 Database = mongoClient.GetDatabase(DatabaseName);
             }
-            catch
+            catch(Exception ex)
             {
-                throw new Exception("Failed to connect to database.");
+                throw new Exception($"Failed to connect to database. Error: {ex.Message}");
             }
         }
 
