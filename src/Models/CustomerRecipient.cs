@@ -45,5 +45,8 @@ namespace api_slim.src.Models
 
         [BsonElement("notes")]
         public string Notes { get; set; } = string.Empty;
+       
+        [BsonElement("bond")]
+        public string Bond { get; set; } = string.Empty;
     } 
 }

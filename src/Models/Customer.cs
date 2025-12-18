@@ -12,12 +12,6 @@ namespace api_slim.src.Models
         
         [BsonElement("type")]
         public string Type { get; set; } = string.Empty;
-        
-        // [BsonElement("contractor")]
-        // public Contractor Contractor { get; set; } = new();
-
-        // [BsonElement("recipient")]
-        // public Recipient Recipient { get; set; } = new();
 
         [BsonElement("corporateName")]
         public string CorporateName { get; set; } = string.Empty; // Mapeado do campo "Nome"
@@ -32,13 +26,10 @@ namespace api_slim.src.Models
         public string Rg { get; set; } = string.Empty; // Mapeado do campo "RG"
 
         [BsonElement("dateOfBirth")]
-        public DateTime DateOfBirth { get; set; } // Mapeado do campo "Data de Nascimento"
+        public DateTime? DateOfBirth { get; set; } // Mapeado do campo "Data de Nascimento"
 
         [BsonElement("gender")]
         public string Gender { get; set; } = string.Empty; // Mapeado do campo "Gênero"
-
-        // [BsonElement("address")]
-        // public Address Address { get; set; } = new Address();
 
         [BsonElement("phone")]
         public string Phone { get; set; } = string.Empty; // Mapeado do campo "Telefone"
@@ -49,8 +40,8 @@ namespace api_slim.src.Models
         [BsonElement("email")]
         public string Email { get; set; } = string.Empty; // Mapeado do campo "E-mail"
 
-        [BsonElement("segments")]
-        public string Segments { get; set; } = string.Empty; // Mapeado do campo "Origem" (5)
+        [BsonElement("segment")]
+        public string Segment { get; set; } = string.Empty; // Mapeado do campo "Origem" (5)
 
         [BsonElement("origin")]
         public string Origin { get; set; } = string.Empty; // Mapeado do campo "Origem" (5)
@@ -160,6 +151,8 @@ namespace api_slim.src.Models
         
         [BsonElement("email")]
         public string Email { get; set; } = string.Empty;
+        // [BsonElement("address")]
+        // public Address Address { get; set; } = new Address();
     }
 
     public class Recipient

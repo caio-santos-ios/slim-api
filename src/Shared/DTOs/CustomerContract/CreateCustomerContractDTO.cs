@@ -19,7 +19,8 @@ public class CreateCustomerContractDTO
         public string ChargingMethodInstallment { get; set; } = string.Empty;
         public string TypeRecurrence { get; set; } = string.Empty;
         public string Recurrence { get; set; } = string.Empty;
-        public DateTime? RecurrencePeriod { get; set; }
+        // public DateTime? RecurrencePeriod { get; set; }
+        public string RecurrencePeriod { get; set; } = string.Empty;
         public DateTime? DueDate { get; set; }
         public string BillingPeriod { get; set; } = string.Empty;
         public string Billing { get; set; } = string.Empty;

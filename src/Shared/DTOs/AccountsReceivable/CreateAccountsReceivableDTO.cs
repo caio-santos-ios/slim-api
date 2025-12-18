@@ -2,9 +2,10 @@ namespace api_slim.src.Shared.DTOs
 {
     public class CreateAccountsReceivableDTO
     {
-        public string Contract {get;set;} = string.Empty;
-        public string Category {get;set;} = string.Empty;
-        public string CostCenter {get;set;} = string.Empty;      
-        public string PaymentMethod {get;set;} = string.Empty;
+        public string CustomerId {get;set;} = string.Empty;
+        public string ContractId {get;set;} = string.Empty;
+        public decimal Value {get;set;} = 0;
+        public decimal LowValue {get;set;} = 0;
+        public DateTime? LowDate { get; set; }
     }
 }

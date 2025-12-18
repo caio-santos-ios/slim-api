@@ -21,11 +21,17 @@ namespace api_slim.src.Repository
                 new("$match", pagination.PipelineFilter),
                 new("$sort", pagination.PipelineSort),  
 
+                
+                new("$addFields", new BsonDocument
+                {
+                    {"id", new BsonDocument("$toString", "$_id")},
+                }),
+
                 new BsonDocument("$lookup", new BsonDocument
                 {
                     { "from", "addresses" },
 
-                    { "let", new BsonDocument("profId", "$_id") },
+                    { "let", new BsonDocument("profId", "$id") },
 
                     { "pipeline", new BsonArray
                         {
@@ -35,7 +41,8 @@ namespace api_slim.src.Repository
                                     {
                                         new BsonDocument("$eq", new BsonArray
                                         {
-                                            new BsonDocument("$toObjectId", "$parentId"),
+                                            // new BsonDocument("$toObjectId", "$parentId"),
+                                            "$parentId",
                                             "$$profId"
                                         }),
 
@@ -88,12 +95,17 @@ namespace api_slim.src.Repository
                 new BsonDocument("$lookup", new BsonDocument
                 {
                     { "from", "plans" },
-                    { "let", new BsonDocument("registrationId", new BsonDocument("$toObjectId", "$planId")) },
+                    { "let", new BsonDocument("registrationId", "$planId") },
                     { "pipeline", new BsonArray
                         {
+                            new BsonDocument("$addFields", new BsonDocument
+                            {
+                                // Criamos uma versão string do _id do plano para comparar
+                                { "idString", new BsonDocument("$toString", "$_id") }
+                            }),
                             new BsonDocument("$match", new BsonDocument
                             {
-                                { "$expr", new BsonDocument("$eq", new BsonArray { "$_id", "$$registrationId" }) }
+                                { "$expr", new BsonDocument("$eq", new BsonArray { "$idString", "$$registrationId" }) }
                             })
                         }
                     },
@@ -108,7 +120,6 @@ namespace api_slim.src.Repository
 
                 new("$addFields", new BsonDocument
                 {
-                    {"id", new BsonDocument("$toString", "$_id")},
                     {"address", new BsonDocument
                         {
                             {"id", new BsonDocument("$ifNull", new BsonArray { new BsonDocument("$toString", "$_address._id"), "" })},

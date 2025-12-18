@@ -10,5 +10,6 @@ public class CreateAttachmentDTO
     public IFormFile? File { get; set; }
     public string ParentId { get; set; } = string.Empty;
     public string Parent { get; set; } = string.Empty;
+    public string Description { get; set; } = string.Empty;
 }
 }

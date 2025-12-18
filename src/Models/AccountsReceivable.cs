@@ -10,16 +10,19 @@ namespace api_slim.src.Models
         [BsonRepresentation(BsonType.ObjectId)]
         public string Id { get; set; } = string.Empty;
         
-        [BsonElement("contract")]
-        public string Contract {get;set;} = string.Empty;
+        [BsonElement("customerId")]
+        public string CustomerId {get;set;} = string.Empty;
 
-        [BsonElement("category")]
-        public string Category {get;set;} = string.Empty;
+        [BsonElement("contractId")]
+        public string ContractId {get;set;} = string.Empty;
+        
+        [BsonElement("value")]
+        public decimal Value {get;set;} = 0;
 
-        [BsonElement("costCenter")]
-        public string CostCenter {get;set;} = string.Empty;
-      
-        [BsonElement("paymentMethod")]
-        public string PaymentMethod {get;set;} = string.Empty;
+        [BsonElement("lowValue")]
+        public decimal LowValue {get;set;} = 0;
+        
+        [BsonElement("lowDate")]
+        public DateTime? LowDate { get; set; }
     }
 }

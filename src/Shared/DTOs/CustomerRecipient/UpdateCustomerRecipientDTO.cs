@@ -18,5 +18,6 @@ namespace api_slim.src.Shared.DTOs
                 public string PlanId { get; set; } = string.Empty; 
                 public string Notes { get; set; } = string.Empty;
                 public string ContractorId { get; set; } = string.Empty;
+                public string Bond { get; set; } = string.Empty;
         }
 }

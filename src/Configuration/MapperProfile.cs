@@ -50,6 +50,9 @@ namespace api_slim.src.Configuration
             
             CreateMap<CreateCustomerDTO, Customer>().ReverseMap();
             CreateMap<UpdateCustomerDTO, Customer>().ReverseMap();      
+
+            CreateMap<CreateContractorResponsibleDTO, ContractorResponsible>().ReverseMap();
+            CreateMap<CreateContractorResponsibleDTO, ContractorResponsible>().ReverseMap();      
             
             CreateMap<CreateCustomerRecipientDTO, CustomerRecipient>().ReverseMap();
             CreateMap<UpdateCustomerRecipientDTO, CustomerRecipient>().ReverseMap();      

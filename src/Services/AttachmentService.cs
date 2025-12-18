@@ -46,7 +46,6 @@ namespace api_slim.src.Services
         try
         {
             if(request.File is null) return new(null, 400, "Arquivo é obrigatório.");
-            // if (string.IsNullOrEmpty(env.WebRootPath)) throw new Exception("WebRootPath não configurado. Verifique a pasta wwwroot.");
 
             Attachment attachment = _mapper.Map<Attachment>(request);
             ResponseApi<Attachment?> response = await attachmentRepository.CreateAsync(attachment);
@@ -70,15 +69,14 @@ namespace api_slim.src.Services
                 await request.File.CopyToAsync(stream);
             }
 
-            attachment.Uri = Path.Combine("wwwroot", "uploads", request.Parent, fileName);
+            attachment.Uri = Path.Combine("uploads", request.Parent, fileName);
             await attachmentRepository.UpdateAsync(attachment);
 
             if(response.Data is null) return new(null, 400, "Falha ao criar Anexo.");
             return new(response.Data, 201, "Anexo criado com sucesso.");
         }
-        catch(Exception ex)
+        catch
         { 
-            System.Console.WriteLine(ex.Message);
             return new(null, 500, $"Ocorreu um erro inesperado. Por favor, tente novamente mais tarde");
         }
     }
@@ -97,6 +95,31 @@ namespace api_slim.src.Services
 
             ResponseApi<Attachment?> response = await attachmentRepository.UpdateAsync(attachment);
             if(!response.IsSuccess) return new(null, 400, "Falha ao atualizar");
+
+            if(request.File is not null) {
+                string webRoot = env.WebRootPath;
+
+                if (string.IsNullOrEmpty(webRoot))
+                {
+                    webRoot = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot");
+                };
+
+                string uploadPath = Path.Combine(webRoot, "uploads", request.Parent);
+
+                if (!Directory.Exists(uploadPath)) Directory.CreateDirectory(uploadPath);
+
+                string fileName = $"{Guid.NewGuid()}{Path.GetExtension(request.File!.FileName)}";
+                string filePath = Path.Combine(uploadPath, fileName);
+
+                using (var stream = new FileStream(filePath, FileMode.Create))
+                {
+                    await request.File.CopyToAsync(stream);
+                }
+
+                attachment.Uri = Path.Combine("uploads", request.Parent, fileName);
+                await attachmentRepository.UpdateAsync(attachment);
+            };
+
             return new(response.Data, 200, "Atualizado com sucesso");
         }
         catch

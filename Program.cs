@@ -1,5 +1,6 @@
 using api_slim.src.Configuration;
 using DotNetEnv;
+using Microsoft.Extensions.FileProviders;
 
 WebApplicationBuilder builder = WebApplication.CreateBuilder(args);
 
@@ -77,7 +78,15 @@ app.UseCors(
         : ProductionCorsPolicy
 );
 
+
+var uploadPath = Path.Combine(builder.Environment.ContentRootPath, "wwwroot", "uploads");
+if (!Directory.Exists(uploadPath))
+{
+    Directory.CreateDirectory(uploadPath);
+}
+
 app.UseStaticFiles();
+
 app.UseAuthentication();
 app.UseAuthorization();
 app.MapControllers();

@@ -7,7 +7,7 @@ using AutoMapper;
 
 namespace api_slim.src.Services
 {
-    public class CustomerContractService(ICustomerContractRepository customerContractRepository, IMapper _mapper) : ICustomerContractService
+    public class CustomerContractService(ICustomerContractRepository customerContractRepository, IAccountsReceivableService accountsReceivableService, IMapper _mapper) : ICustomerContractService
 {
     #region READ
     public async Task<PaginationApi<List<dynamic>>> GetAllAsync(GetAllDTO request)
@@ -58,6 +58,20 @@ namespace api_slim.src.Services
             ResponseApi<CustomerContract?> response = await customerContractRepository.CreateAsync(customerContract);
 
             if(response.Data is null) return new(null, 400, "Falha ao criar Contrato.");
+
+            if(request.Type == "Avulsos") 
+            {
+                CreateAccountsReceivableDTO accountsReceivable = new ()
+                {
+                    ContractId = customerContract.Id,
+                    Value = customerContract.Value,
+                    LowDate = null,
+                    LowValue = 0,
+                    CustomerId = customerContract.ContractorId
+                };
+
+                await accountsReceivableService.CreateAsync(accountsReceivable);
+            };
 
             return new(response.Data, 201, "Contrato criado com sucesso.");
         }

@@ -65,7 +65,8 @@ namespace api_slim.src.Models
         public string Recurrence { get; set; } = string.Empty;
 
         [BsonElement("recurrencePeriod")]
-        public DateTime? RecurrencePeriod { get; set; }
+        // public DateTime? RecurrencePeriod { get; set; }
+        public string RecurrencePeriod { get; set; } = string.Empty;
 
         [BsonElement("dueDate")]
         public DateTime? DueDate { get; set; }

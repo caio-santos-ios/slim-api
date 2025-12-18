@@ -41,7 +41,8 @@ namespace api_slim.src.Controllers
         
         [Authorize]
         [HttpPut]
-        public async Task<IActionResult> Update([FromBody] UpdateAttachmentDTO request)
+        [Consumes("multipart/form-data")]
+        public async Task<IActionResult> Update([FromForm] UpdateAttachmentDTO request)
         {
             if (request == null) return BadRequest("Dados inválidos.");
 

@@ -21,6 +21,11 @@ namespace api_slim.src.Repository
                 new("$match", pagination.PipelineFilter),
                 new("$sort", pagination.PipelineSort),  
 
+                new("$addFields", new BsonDocument
+                {
+                    {"id", new BsonDocument("$toString", "$_id")},
+                }),
+
                 new BsonDocument("$lookup", new BsonDocument
                 {
                     { "from", "addresses" },
@@ -35,7 +40,8 @@ namespace api_slim.src.Repository
                                     {
                                         new BsonDocument("$eq", new BsonArray
                                         {
-                                            new BsonDocument("$toObjectId", "$parentId"),
+                                            // new BsonDocument("$toObjectId", "$parentId"),
+                                            "$parentId",
                                             "$$profId"
                                         }),
 
@@ -113,7 +119,7 @@ namespace api_slim.src.Repository
 
                 new("$addFields", new BsonDocument
                 {
-                    {"id", new BsonDocument("$toString", "$_id")},
+                    // {"id", new BsonDocument("$toString", "$_id")},
                     {"address", new BsonDocument
                         {
                             {"id", new BsonDocument("$ifNull", new BsonArray { new BsonDocument("$toString", "$_address._id"), "" })},
@@ -167,8 +173,6 @@ namespace api_slim.src.Repository
                 {
                     {"_id", 0},
                     {"id", new BsonDocument("$toString", "$_id")},
-                    {"name", 1},
-                    {"description", 1}
                 }),
             ];
 

@@ -56,31 +56,36 @@ namespace api_slim.src.Services
             address.ParentId = response.Data!.Id;
             ResponseApi<Address?> addressResponse = await addressRepository.CreateAsync(address);
             if(!addressResponse.IsSuccess) return new(null, 400, "Falha ao criar Item.");
-
-            switch(request.TypePlan)
+            if(request.Type == "B2C")
             {
-                case "Individual":
-                case "Familiar":
-                    await customerRecipientService.CreateAsync(new ()
-                    {
-                        Address = request.Address,
-                        DocumentContract = request.Document,
-                        Name = request.CorporateName,
-                        Cpf = request.Document,
-                        Rg = request.Rg,
-                        DateOfBirth = request.DateOfBirth,
-                        Gender = request.Gender,
-                        Phone = request.Phone,
-                        Whatsapp = request.Whatsapp,
-                        Email = request.Email,
-                        Notes = request.Notes,
-                        PlanId = ""
-                    });
-                    break;
+                switch(request.TypePlan)
+                {
+                    case "Individual":
+                    case "Familiar":
+                        Address recipientAddress = request.Address;
+                        recipientAddress.Id = "";
+                        ResponseApi<CustomerRecipient?> res = await customerRecipientService.CreateAsync(new ()
+                        {
+                            Address = recipientAddress,
+                            DocumentContract = request.Document,
+                            Name = request.CorporateName,
+                            Cpf = request.Document,
+                            Rg = request.Rg,
+                            DateOfBirth = request.DateOfBirth,
+                            Gender = request.Gender,
+                            Phone = request.Phone,
+                            Whatsapp = request.Whatsapp,
+                            Email = request.Email,
+                            Notes = request.Notes,
+                            PlanId = "",
+                            ContractorId = response.Data.Id
+                        });
+                        break;
 
-                case "Concessão":
-                case "Concessão - Familia":
-                    break;
+                    case "Concessão":
+                    case "Concessão - Familia":
+                        break;
+                }
             }
 
             return new(response.Data, 201, "Cliente criado com sucesso.");
@@ -119,8 +124,25 @@ namespace api_slim.src.Services
             else
             {
                 Address address = _mapper.Map<Address>(request.Address);
-                address.Parent = "customer-contract";
-                address.ParentId = response.Data!.Id;
+                // address.Parent = "customer-contract";
+                // address.ParentId = response.Data!.Id;
+                ResponseApi<Address?> addressResponse = await addressRepository.CreateAsync(address);
+                if(!addressResponse.IsSuccess) return new(null, 400, "Falha ao criar Item.");
+            };
+            
+            if(!string.IsNullOrEmpty(request.Responsible.Address.Id))
+            {
+                ResponseApi<Address?> findAddress = await addressRepository.GetByParentIdAsync(request.Responsible.Address.ParentId, request.Responsible.Address.Parent);
+                if(!findAddress.IsSuccess || findAddress.Data is null) return new(null, 400, "Falha ao atualizar.");
+                
+                request.Responsible.Address.Id = findAddress.Data.Id;
+            
+                ResponseApi<Address?> addressResponse = await addressRepository.UpdateAsync(request.Responsible.Address);
+                if(!addressResponse.IsSuccess) return new(null, 400, "Falha ao atualizar.");
+            }
+            else
+            {
+                Address address = _mapper.Map<Address>(request.Responsible.Address);
                 ResponseApi<Address?> addressResponse = await addressRepository.CreateAsync(address);
                 if(!addressResponse.IsSuccess) return new(null, 400, "Falha ao criar Item.");
             };

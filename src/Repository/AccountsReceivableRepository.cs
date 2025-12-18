@@ -22,18 +22,161 @@ namespace api_slim.src.Repository
                     new("$sort", pagination.PipelineSort),
                     new("$skip", pagination.Skip),
                     new("$limit", pagination.Limit),
-                    new("$addFields", new BsonDocument
+                    
+                    new BsonDocument("$lookup", new BsonDocument
                     {
-                        {"id", new BsonDocument("$toString", "$_id")},
+                        { "from", "customers" },
+
+                        { "let", new BsonDocument("profId", new BsonDocument("$toObjectId", "$customerId")) },
+
+                        { "pipeline", new BsonArray
+                            {
+                                new BsonDocument("$match", new BsonDocument
+                                {
+                                    { "$expr", new BsonDocument("$and", new BsonArray
+                                        {
+                                            new BsonDocument("$eq", new BsonArray
+                                            {
+                                                "$_id",
+                                                "$$profId"
+                                            }),
+                                        })
+                                    }
+                                })
+                            }
+                        },
+
+                        { "as", "_customer" }
                     }),
+
+                    new BsonDocument("$unwind", new BsonDocument
+                    {
+                        { "path", "$_customer" },
+                        { "preserveNullAndEmptyArrays", true }
+                    }),
+                    
+                    new BsonDocument("$lookup", new BsonDocument
+                    {
+                        { "from", "customer_contracts" },
+
+                        { "let", new BsonDocument("profId", new BsonDocument("$toObjectId", "$contractId")) },
+
+                        { "pipeline", new BsonArray
+                            {
+                                new BsonDocument("$match", new BsonDocument
+                                {
+                                    { "$expr", new BsonDocument("$and", new BsonArray
+                                        {
+                                            new BsonDocument("$eq", new BsonArray
+                                            {
+                                                "$_id",
+                                                "$$profId"
+                                            }),
+                                        })
+                                    }
+                                })
+                            }
+                        },
+
+                        { "as", "_contract" }
+                    }),
+
+                    new BsonDocument("$unwind", new BsonDocument
+                    {
+                        { "path", "$_contract" },
+                        { "preserveNullAndEmptyArrays", true }
+                    }),
+
+                    new BsonDocument("$lookup", new BsonDocument
+                    {
+                        { "from", "generic_tables" }, 
+                        { "let", new BsonDocument("category", "$_contract.category") },
+                        { "pipeline", new BsonArray
+                            {
+                                new BsonDocument("$match", new BsonDocument
+                                {
+                                    { "$expr", new BsonDocument("$and", new BsonArray
+                                        {
+                                            new BsonDocument("$eq", new BsonArray { "$code", "$$category" }),
+                                            new BsonDocument("$eq", new BsonArray { "$table", "categoria-contrato-cliente" })
+                                        })
+                                    }
+                                })
+                            }
+                        },
+                        { "as", "_category" } 
+                    }),
+
+                    new BsonDocument("$unwind", new BsonDocument
+                    {
+                        { "path", "$_category" },
+                        { "preserveNullAndEmptyArrays", true }
+                    }),
+                    
+                    new BsonDocument("$lookup", new BsonDocument
+                    {
+                        { "from", "generic_tables" }, 
+                        { "let", new BsonDocument("costCenter", "$_contract.costCenter") },
+                        { "pipeline", new BsonArray
+                            {
+                                new BsonDocument("$match", new BsonDocument
+                                {
+                                    { "$expr", new BsonDocument("$and", new BsonArray
+                                        {
+                                            new BsonDocument("$eq", new BsonArray { "$code", "$$costCenter" }),
+                                            new BsonDocument("$eq", new BsonArray { "$table", "centro-custo" })
+                                        })
+                                    }
+                                })
+                            }
+                        },
+                        { "as", "_costCenter" } 
+                    }),
+
+                    new BsonDocument("$unwind", new BsonDocument
+                    {
+                        { "path", "$_costCenter" },
+                        { "preserveNullAndEmptyArrays", true }
+                    }),
+                    
+                    new BsonDocument("$lookup", new BsonDocument
+                    {
+                        { "from", "generic_tables" }, 
+                        { "let", new BsonDocument("paymentMethod", "$_contract.paymentMethod") },
+                        { "pipeline", new BsonArray
+                            {
+                                new BsonDocument("$match", new BsonDocument
+                                {
+                                    { "$expr", new BsonDocument("$and", new BsonArray
+                                        {
+                                            new BsonDocument("$eq", new BsonArray { "$code", "$$paymentMethod" }),
+                                            new BsonDocument("$eq", new BsonArray { "$table", "forma-pagamento" })
+                                        })
+                                    }
+                                })
+                            }
+                        },
+                        { "as", "_payment_method" } 
+                    }),
+
+                    new BsonDocument("$unwind", new BsonDocument
+                    {
+                        { "path", "$_payment_method" },
+                        { "preserveNullAndEmptyArrays", true }
+                    }),
+
                     new("$project", new BsonDocument
                     {
                         {"_id", 0},
-                        {"password", 0},
-                        {"role", 0},
-                        {"blocked", 0},
-                        {"codeAccess", 0},
-                        {"validatedAccess", 0}
+                        {"id", new BsonDocument("$toString", "$_id")},
+                        {"value", 1},
+                        {"lowValue", 1},
+                        {"customerName", new BsonDocument("$ifNull", new BsonArray {"$_customer.corporateName" , "" })},
+                        {"contractCode", new BsonDocument("$ifNull", new BsonArray {"$_contract.code" , "" })},
+                        {"categoryDescription", new BsonDocument("$ifNull", new BsonArray { "$_category.description", "" })},
+                        {"costCenterDescription", new BsonDocument("$ifNull", new BsonArray { "$_costCenter.description", "" })},
+                        {"paymentMethodDescription", new BsonDocument("$ifNull", new BsonArray { "$_payment_method.description", "" })},
+
                     }),
                     new("$sort", pagination.PipelineSort),
                 };
