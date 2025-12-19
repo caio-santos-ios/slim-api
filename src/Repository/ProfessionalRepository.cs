@@ -23,62 +23,61 @@ namespace api_slim.src.Repository
                 new("$skip", pagination.Skip),
                 new("$limit", pagination.Limit),               
                 
-                new BsonDocument("$lookup", new BsonDocument
+                 new BsonDocument("$lookup", new BsonDocument
                 {
                     { "from", "generic_tables" }, 
-                    { "let", new BsonDocument("typeId", new BsonDocument("$toObjectId", "$type")) },
+                    { "let", new BsonDocument("type", "$type") },
                     { "pipeline", new BsonArray
                         {
                             new BsonDocument("$match", new BsonDocument
                             {
-                                { "$expr", new BsonDocument("$eq", new BsonArray { "$_id", "$$typeId" }) }
+                                { "$expr", new BsonDocument("$and", new BsonArray
+                                    {
+                                        new BsonDocument("$eq", new BsonArray { "$code", "$$type" }),
+                                        new BsonDocument("$eq", new BsonArray { "$table", "tipo-profissional" })
+                                    })
+                                }
                             })
                         }
                     },
                     { "as", "_type" } 
                 }),
 
-                new BsonDocument("$unwind", "$_type"),
-
                 new BsonDocument("$lookup", new BsonDocument
                 {
                     { "from", "generic_tables" }, 
-                    { "let", new BsonDocument("specialtyId", new BsonDocument("$toObjectId", "$specialty")) },
+                    { "let", new BsonDocument("specialty", "$specialty") },
                     { "pipeline", new BsonArray
                         {
                             new BsonDocument("$match", new BsonDocument
                             {
-                                { "$expr", new BsonDocument("$eq", new BsonArray { "$_id", "$$specialtyId" }) }
+                                { "$expr", new BsonDocument("$eq", new BsonArray { "$code", "$$specialty" }) }
                             })
                         }
                     },
                     { "as", "_specialty" } 
                 }),
-
-                new BsonDocument("$unwind", "$_specialty"),
                
                 new BsonDocument("$lookup", new BsonDocument
                 {
                     { "from", "generic_tables" }, 
-                    { "let", new BsonDocument("registrationId", new BsonDocument("$toObjectId", "$registration")) },
+                    { "let", new BsonDocument("registration", "$registration") },
                     { "pipeline", new BsonArray
                         {
                             new BsonDocument("$match", new BsonDocument
                             {
-                                { "$expr", new BsonDocument("$eq", new BsonArray { "$_id", "$$registrationId" }) }
+                                { "$expr", new BsonDocument("$eq", new BsonArray { "$code", "$$registration" }) }
                             })
                         }
                     },
                     { "as", "_registration" } 
                 }),
 
-                new BsonDocument("$unwind", "$_registration"),
-                
                 new BsonDocument("$lookup", new BsonDocument
                 {
                     { "from", "addresses" },
 
-                    { "let", new BsonDocument("profId", "$_id") },
+                    { "let", new BsonDocument("profId", new BsonDocument("$toString", "$_id")) },
 
                     { "pipeline", new BsonArray
                         {
@@ -88,7 +87,7 @@ namespace api_slim.src.Repository
                                     new BsonDocument("$eq",
                                         new BsonArray
                                         {
-                                            new BsonDocument("$toObjectId", "$parentId"), 
+                                            "$parentId",
                                             "$$profId"                                     
                                         }
                                     )
@@ -100,14 +99,18 @@ namespace api_slim.src.Repository
                     { "as", "_address" }
                 }),
 
-                new BsonDocument("$unwind", "$_address"),
+                new BsonDocument("$unwind", new BsonDocument
+                {
+                    { "path", "$_address" },
+                    { "preserveNullAndEmptyArrays", true }
+                }),
                 
                 new("$addFields", new BsonDocument
                 {
                     {"id", new BsonDocument("$toString", "$_id")},
-                    {"specialtyName", "$_specialty.description"},
-                    {"typeName", "$_type.description"},
-                    {"registrationName", "$_registration.description"},
+                    {"typeName", new BsonDocument("$first", "$_type.description")},
+                    {"specialtyName", new BsonDocument("$first", "$_specialty.description")},
+                    {"registrationName", new BsonDocument("$first", "$_registration.description")},
                     {"address", new BsonDocument
                         {
                             {"id", new BsonDocument("$toString", "$_address._id")},
