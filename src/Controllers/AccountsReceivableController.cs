@@ -48,6 +48,17 @@ namespace api_slim.src.Controllers
 
             return StatusCode(response.StatusCode, new { response.Message, response.Result });
         }
+       
+        [Authorize]
+        [HttpPut("low")]
+        public async Task<IActionResult> Low([FromBody] UpdateAccountsReceivableDTO user)
+        {
+            if (user == null) return BadRequest("Dados inválidos.");
+
+            ResponseApi<AccountsReceivable?> response = await userService.UpdateLowAsync(user);
+
+            return StatusCode(response.StatusCode, new { response.Message, response.Result });
+        }
         
         [Authorize]
         [HttpDelete("{id}")]

@@ -9,6 +9,7 @@ public interface IServiceModuleRepository
     Task<ResponseApi<List<dynamic>>> GetAllAsync(PaginationUtil<ServiceModule> pagination);
     Task<ResponseApi<dynamic?>> GetByIdAggregateAsync(string id);
     Task<ResponseApi<ServiceModule?>> GetByIdAsync(string id);
+    Task<ResponseApi<List<ServiceModule>>> GetByPlanIdAsync(string planId);
     Task<int> GetCountDocumentsAsync(PaginationUtil<ServiceModule> pagination);
     Task<ResponseApi<ServiceModule?>> CreateAsync(ServiceModule serviceModule);
     Task<ResponseApi<ServiceModule?>> UpdateAsync(ServiceModule serviceModule);

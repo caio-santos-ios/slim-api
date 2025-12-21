@@ -8,8 +8,10 @@ namespace api_slim.src.Interfaces
     {
         Task<PaginationApi<List<dynamic>>> GetAllAsync(GetAllDTO request);
         Task<ResponseApi<dynamic?>> GetByIdAggregateAsync(string id);
+        Task<ResponseApi<List<AccountsReceivable>>> GetByContractId(string contractId);
         Task<ResponseApi<AccountsReceivable?>> CreateAsync(CreateAccountsReceivableDTO user);
         Task<ResponseApi<AccountsReceivable?>> UpdateAsync(UpdateAccountsReceivableDTO request);
+        Task<ResponseApi<AccountsReceivable?>> UpdateLowAsync(UpdateAccountsReceivableDTO request);
         Task<ResponseApi<AccountsReceivable>> DeleteAsync(string id);
     }
 }

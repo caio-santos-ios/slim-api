@@ -230,10 +230,10 @@ namespace api_slim.src.Services
                     request.Photo.CopyTo(stream);
                 }
 
-                string uriPhoto = await cloudinaryHandler.Upload(tempPath, "api-barber", "users");
-                if(string.IsNullOrEmpty(uriPhoto)) return new(null, 400, "Falha ao salvar foto de perfil");
-                user.Data.UpdatedAt = DateTime.UtcNow;
-                user.Data.Photo = uriPhoto;
+                // string uriPhoto = await cloudinaryHandler.Upload(tempPath, "api-barber", "users");
+                // if(string.IsNullOrEmpty(uriPhoto)) return new(null, 400, "Falha ao salvar foto de perfil");
+                // user.Data.UpdatedAt = DateTime.UtcNow;
+                // user.Data.Photo = uriPhoto;
 
                 ResponseApi<User?> response = await userRepository.UpdateAsync(user.Data);
                 if(!response.IsSuccess) return new(null, 400, "Falha ao salvar foto de perfil");

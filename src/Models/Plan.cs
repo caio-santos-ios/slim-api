@@ -15,6 +15,9 @@ namespace api_slim.src.Models
 
         [BsonElement("price")]
         public decimal Price { get; set; }
+        
+        [BsonElement("cost")]
+        public decimal Cost { get; set; }
 
         [BsonElement("type")]
         public string Type { get; set; } = string.Empty;
@@ -22,7 +25,7 @@ namespace api_slim.src.Models
         [BsonElement("description")]
         public string Description { get; set; } = string.Empty;
 
-        [BsonElement("serviceModuleId")]
-        public string ServiceModuleId { get; set; } = string.Empty;
+        [BsonElement("image")]
+        public string Image { get; set; } = string.Empty;
     }
 }

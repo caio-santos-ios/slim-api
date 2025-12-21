@@ -107,6 +107,7 @@ namespace api_slim.src.Services
             
             Customer customer = _mapper.Map<Customer>(request);
             customer.UpdatedAt = DateTime.UtcNow;
+            customer.CreatedAt = customerResponse.Data.CreatedAt;
 
             ResponseApi<Customer?> response = await customerRepository.UpdateAsync(customer);
             if(!response.IsSuccess) return new(null, 400, "Falha ao atualizar");

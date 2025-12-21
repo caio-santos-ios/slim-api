@@ -26,29 +26,42 @@ namespace api_slim.src.Repository
                 new BsonDocument("$lookup", new BsonDocument
                 {
                     { "from", "service_modules" },
-                    { "let", new BsonDocument("registrationId", new BsonDocument("$toObjectId", "$serviceModuleId")) },
+                    { "let", new BsonDocument("planIdStr", new BsonDocument("$toString", "$_id")) },
                     { "pipeline", new BsonArray
                         {
                             new BsonDocument("$match", new BsonDocument
                             {
-                                { "$expr", new BsonDocument("$eq", new BsonArray { "$_id", "$$registrationId" }) }
+                                { "$expr", new BsonDocument("$eq", new BsonArray { "$planId", "$$planIdStr" }) }
                             })
                         }
                     },
-                    { "as", "_service_module" }
+                    { "as", "_service_modules" } 
                 }),
-                new BsonDocument("$unwind", "$_service_module"),
 
-                new("$addFields", new BsonDocument
+                new BsonDocument("$addFields", new BsonDocument
                 {
-                    {"id", new BsonDocument("$toString", "$_id")},
-                    {"serviceModuleId", new BsonDocument("$ifNull", new BsonArray { new BsonDocument("$toString", "$_service_module._id"), "" })},
-                    {"serviceModule", new BsonDocument("$ifNull", new BsonArray { "$_service_module.name", "" })},
+                    { "id", new BsonDocument("$toString", "$_id") },
+                    { "uri", "$image" },
+                    { "serviceModuleIds", new BsonDocument("$map", new BsonDocument
+                        {
+                            { "input", "$_service_modules" },
+                            { "as", "m" },
+                            // { "in", new BsonDocument("$toString", "$$m._id") }
+                            { "in", new BsonDocument
+                                {
+                                    { "id", new BsonDocument("$toString", "$$m._id") },
+                                    { "name", "$$m.name" },
+                                    { "planId", "$$m.planId" }
+                                }
+                            }
+                        })
+                    }
                 }),
-                new("$project", new BsonDocument
+
+                new BsonDocument("$project", new BsonDocument
                 {
-                    {"_id", 0}, 
-                    {"_service_module", 0}, 
+                    { "_id", 0 },
+                    { "_service_modules", 0 }
                 }),
                 new("$sort", pagination.PipelineSort),
             };

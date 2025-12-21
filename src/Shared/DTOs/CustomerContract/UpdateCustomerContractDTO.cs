@@ -13,8 +13,11 @@ namespace api_slim.src.Shared.DTOs
                 public string Category { get; set; } = string.Empty;
                 public string CostCenter { get; set; } = string.Empty;
                 public string SellerId { get; set; } = string.Empty;
-                public string ServiceModuleId { get; set; } = string.Empty;
-                public decimal Value { get; set; }
+                public string PlanId { get; set; } = string.Empty;
+                public List<string> ServiceModuleIds { get; set; } = [];
+                public decimal SubTotal { get; set; }
+                public decimal Total { get; set; }
+                public decimal Discount { get; set; }                
                 public string PaymentMethod { get; set; } = string.Empty;
                 public string ReceiptAccount { get; set; } = string.Empty;
                 public string PaymentCondition { get; set; } = string.Empty;
@@ -23,7 +26,7 @@ namespace api_slim.src.Shared.DTOs
                 public string ChargingMethodInstallment { get; set; } = string.Empty;
                 public string TypeRecurrence { get; set; } = string.Empty;
                 public string Recurrence { get; set; } = string.Empty;
-                public DateTime? RecurrencePeriod { get; set; }
+                public string RecurrencePeriod { get; set; } = string.Empty;
                 public DateTime? DueDate { get; set; }
                 public string BillingPeriod { get; set; } = string.Empty;
                 public string Billing { get; set; } = string.Empty;

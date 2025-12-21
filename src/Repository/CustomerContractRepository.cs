@@ -40,7 +40,6 @@ namespace api_slim.src.Repository
                                     {
                                         new BsonDocument("$eq", new BsonArray
                                         {
-                                            // new BsonDocument("$toObjectId", "$parentId"),
                                             "$parentId",
                                             "$$profId"
                                         }),
@@ -117,9 +116,39 @@ namespace api_slim.src.Repository
                     { "preserveNullAndEmptyArrays", true }
                 }),
 
+                new BsonDocument("$lookup", new BsonDocument
+                {
+                    { "from", "service_modules" },
+                    { "let", new BsonDocument("planIdStr", "$planId") },
+                    { "pipeline", new BsonArray
+                        {
+                            new BsonDocument("$match", new BsonDocument
+                            {
+                                { "$expr", new BsonDocument("$eq", new BsonArray { "$planId", "$$planIdStr" }) }
+                            })
+                        }
+                    },
+                    { "as", "_service_modules" } 
+                }),
+
+                new BsonDocument("$addFields", new BsonDocument
+                {
+                    { "serviceModulesDetails", new BsonDocument("$filter", new BsonDocument
+                        {
+                            { "input", "$_service_modules" },
+                            { "as", "m" },
+                            { "cond", new BsonDocument("$in", new BsonArray 
+                                { 
+                                    new BsonDocument("$toString", "$$m._id"), // ID do módulo convertido
+                                    "$serviceModuleIds" // O array de strings que está no seu contrato
+                                }) 
+                            }
+                        })
+                    }
+                }),
+
                 new("$addFields", new BsonDocument
                 {
-                    // {"id", new BsonDocument("$toString", "$_id")},
                     {"address", new BsonDocument
                         {
                             {"id", new BsonDocument("$ifNull", new BsonArray { new BsonDocument("$toString", "$_address._id"), "" })},
@@ -136,13 +165,29 @@ namespace api_slim.src.Repository
                     },
                     {"genderDescription", new BsonDocument("$ifNull", new BsonArray { "$_gender.description", "" })},
                     {"categoryDescription", new BsonDocument("$ifNull", new BsonArray { "$_category.description", "" })},
+                    {"serviceModuleIds", new BsonDocument("$map", new BsonDocument
+                        {
+                            { "input", "$serviceModulesDetails" },
+                            { "as", "m" },
+                            { "in", new BsonDocument
+                                {
+                                    { "id", new BsonDocument("$toString", "$$m._id") },
+                                    { "name", "$$m.name" },
+                                    { "planId", "$$m.planId" },
+                                    { "cost", "$$m.cost" },
+                                    { "price", "$$m.price" }
+                                }
+                            }
+                        })
+                    }
                 }),
                 new("$project", new BsonDocument
                 {
                     {"_id", 0}, 
                     {"_address", 0}, 
                     {"_gender", 0}, 
-                    {"_category", 0}
+                    {"_category", 0},
+                    {"_service_modules", 0}
                 }),
                 new("$sort", pagination.PipelineSort),
                 new("$skip", pagination.Skip),

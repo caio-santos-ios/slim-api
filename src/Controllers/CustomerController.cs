@@ -46,7 +46,7 @@ public class CustomerController(ICustomerService customerService) : ControllerBa
 
         ResponseApi<Customer?> response = await customerService.UpdateAsync(customer);
 
-        return StatusCode(response.StatusCode, new { response.Message });
+        return StatusCode(response.StatusCode, new { response.Message, response.Result });
     }
     
     [Authorize]

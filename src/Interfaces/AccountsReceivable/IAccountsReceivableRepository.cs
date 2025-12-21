@@ -9,9 +9,12 @@ namespace api_slim.src.Interfaces
         Task<ResponseApi<List<dynamic>>> GetAllAsync(PaginationUtil<AccountsReceivable> pagination);
         Task<ResponseApi<dynamic?>> GetByIdAggregateAsync(string id);
         Task<ResponseApi<AccountsReceivable?>> GetByIdAsync(string id);
+        Task<ResponseApi<List<AccountsReceivable>>> GetByContractId(string contractId);
+        Task<ResponseApi<long>> GetNextCodeAsync();
         Task<int> GetCountDocumentsAsync(PaginationUtil<AccountsReceivable> pagination);
         Task<ResponseApi<AccountsReceivable?>> CreateAsync(AccountsReceivable user);
         Task<ResponseApi<AccountsReceivable?>> UpdateAsync(AccountsReceivable request);
+        Task<ResponseApi<AccountsReceivable?>> UpdateLowAsync(AccountsReceivable request);
         Task<ResponseApi<AccountsReceivable>> DeleteAsync(string id);
     }
 }

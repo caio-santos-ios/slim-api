@@ -73,7 +73,6 @@ namespace api_slim.src.Repository
                                     {
                                         new BsonDocument("$eq", new BsonArray
                                         {
-                                            // new BsonDocument("$toObjectId", "$parentId"),
                                             "$parentId",
                                             "$$profId"
                                         }),
@@ -112,7 +111,6 @@ namespace api_slim.src.Repository
                                     {
                                         new BsonDocument("$eq", new BsonArray
                                         {
-                                            // new BsonDocument("$toObjectId", "$parentId"),
                                             "$parentId",
                                             "$$profId"
                                         }),
@@ -139,7 +137,6 @@ namespace api_slim.src.Repository
 
                 new("$addFields", new BsonDocument
                 {
-                    // {"id", new BsonDocument("$toString", "$_id")},
                     {"address", new BsonDocument
                         {
                             {"id", new BsonDocument("$ifNull", new BsonArray { new BsonDocument("$toString", "$_address._id"), "" })},
@@ -194,8 +191,8 @@ namespace api_slim.src.Repository
     {
         try
         {
-            Customer? plan = await context.Customers.Find(x => x.Id == id && !x.Deleted).FirstOrDefaultAsync();
-            return new(plan);
+            Customer? customer = await context.Customers.Find(x => x.Id == id && !x.Deleted).FirstOrDefaultAsync();
+            return new(customer);
         }
         catch
         {
@@ -226,13 +223,13 @@ namespace api_slim.src.Repository
     #endregion
     
     #region CREATE
-    public async Task<ResponseApi<Customer?>> CreateAsync(Customer plan)
+    public async Task<ResponseApi<Customer?>> CreateAsync(Customer customer)
     {
         try
         {
-            await context.Customers.InsertOneAsync(plan);
+            await context.Customers.InsertOneAsync(customer);
 
-            return new(plan, 201, "Clientes criado com sucesso");
+            return new(customer, 201, "Clientes criado com sucesso");
         }
         catch
         {
@@ -242,13 +239,13 @@ namespace api_slim.src.Repository
     #endregion
     
     #region UPDATE
-    public async Task<ResponseApi<Customer?>> UpdateAsync(Customer plan)
+    public async Task<ResponseApi<Customer?>> UpdateAsync(Customer customer)
     {
         try
         {
-            await context.Customers.ReplaceOneAsync(x => x.Id == plan.Id, plan);
+            await context.Customers.ReplaceOneAsync(x => x.Id == customer.Id, customer);
 
-            return new(plan, 201, "Clientes atualizado com sucesso");
+            return new(customer, 201, "Clientes atualizado com sucesso");
         }
         catch
         {
@@ -262,14 +259,14 @@ namespace api_slim.src.Repository
     {
         try
         {
-            Customer? plan = await context.Customers.Find(x => x.Id == id && !x.Deleted).FirstOrDefaultAsync();
-            if(plan is null) return new(null, 404, "Clientes não encontrado");
-            plan.Deleted = true;
-            plan.DeletedAt = DateTime.UtcNow;
+            Customer? customer = await context.Customers.Find(x => x.Id == id && !x.Deleted).FirstOrDefaultAsync();
+            if(customer is null) return new(null, 404, "Clientes não encontrado");
+            customer.Deleted = true;
+            customer.DeletedAt = DateTime.UtcNow;
 
-            await context.Customers.ReplaceOneAsync(x => x.Id == id, plan);
+            await context.Customers.ReplaceOneAsync(x => x.Id == id, customer);
 
-            return new(plan, 204, "Clientes excluído com sucesso");
+            return new(customer, 204, "Clientes excluído com sucesso");
         }
         catch
         {

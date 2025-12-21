@@ -19,7 +19,16 @@ namespace api_slim.src.Models
         [BsonElement("description")]
         public string Description {get;set;} = string.Empty;
 
+        [BsonElement("planId")]
+        public string PlanId {get;set;} = string.Empty;
+
+        [BsonElement("price")]
+        public decimal Price { get; set; }
+
         [BsonElement("cost")]
         public decimal Cost {get;set;}
+
+        [BsonElement("image")]
+        public string Image { get; set; } = string.Empty;
     }
 }

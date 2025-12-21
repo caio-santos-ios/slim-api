@@ -4,6 +4,7 @@ using api_slim.src.Models.Base;
 using api_slim.src.Shared.DTOs;
 using api_slim.src.Shared.Utils;
 using AutoMapper;
+using MongoDB.Driver.Linq;
 
 namespace api_slim.src.Services
 {
@@ -59,19 +60,78 @@ namespace api_slim.src.Services
 
             if(response.Data is null) return new(null, 400, "Falha ao criar Contrato.");
 
-            if(request.Type == "Avulsos") 
+            if(request.Type == "Avulsos")
             {
-                CreateAccountsReceivableDTO accountsReceivable = new ()
+                if(request.PaymentCondition == "À Vista") 
                 {
-                    ContractId = customerContract.Id,
-                    Value = customerContract.Value,
-                    LowDate = null,
-                    LowValue = 0,
-                    CustomerId = customerContract.ContractorId
-                };
+                    CreateAccountsReceivableDTO accountsReceivable = new ()
+                    {
+                        ContractId = customerContract.Id,
+                        Value = customerContract.Total,
+                        LowDate = null,
+                        LowValue = 0,
+                        CustomerId = customerContract.ContractorId
+                    };
 
-                await accountsReceivableService.CreateAsync(accountsReceivable);
+                    await accountsReceivableService.CreateAsync(accountsReceivable);
+                }
+                else 
+                {
+                    decimal valueParc = request.Total / request.PaymentInstallmentQuantity;
+                    DateTime? dueDate = request.DueDate;
+
+                    for (int i = 0; i < request.PaymentInstallmentQuantity; i++)
+                    {
+                        DateTime? currentBilling = NextBillingDate(request.BillingPeriod, dueDate, request.Billing);
+
+                        CreateAccountsReceivableDTO accountsReceivable = new ()
+                        {
+                            ContractId = customerContract.Id,
+                            Value = valueParc,
+                            LowDate = null,
+                            LowValue = 0,
+                            CustomerId = customerContract.ContractorId,
+                            DueDate = dueDate,
+                            BillingDate = currentBilling
+                        };
+
+                        await accountsReceivableService.CreateAsync(accountsReceivable);
+
+                        if(dueDate is not null) 
+                        {
+                            dueDate = NextDueDate(request.BillingPeriod, dueDate);
+                        }
+                    }
+                };
+            }
+            else
+            {
+                DateTime? dueDate = request.DueDate;
+                while(request.EndRecurrence > request.SaleDate) 
+                {
+                    DateTime? currentBilling = NextBillingDate(request.BillingPeriod, dueDate, request.Billing);
+
+                    CreateAccountsReceivableDTO accountsReceivable = new ()
+                    {
+                        ContractId = customerContract.Id,
+                        Value = customerContract.Total,
+                        LowDate = null,
+                        LowValue = 0,
+                        CustomerId = customerContract.ContractorId,
+                        DueDate = dueDate,
+                        BillingDate = currentBilling
+                    };
+
+                    await accountsReceivableService.CreateAsync(accountsReceivable);
+
+                    request.SaleDate = request.SaleDate.Value.AddMonths(1);
+                    if(dueDate is not null) 
+                    {
+                        dueDate = NextDueDate(request.BillingPeriod, dueDate);
+                    };
+                }
             };
+
 
             return new(response.Data, 201, "Contrato criado com sucesso.");
         }
@@ -92,9 +152,34 @@ namespace api_slim.src.Services
             
             CustomerContract customerContract = _mapper.Map<CustomerContract>(request);
             customerContract.UpdatedAt = DateTime.UtcNow;
+            customerContract.CreatedAt = customerContractResponse.Data.CreatedAt;
+            customerContract.Code = customerContractResponse.Data.Code;
 
             ResponseApi<CustomerContract?> response = await customerContractRepository.UpdateAsync(customerContract);
             if(!response.IsSuccess) return new(null, 400, "Falha ao atualizar");
+
+            if(request.Type == "Avulsos") 
+            {
+                ResponseApi<List<AccountsReceivable>> list = await accountsReceivableService.GetByContractId(customerContract.Id);
+                if(!list.IsSuccess || list.Data is null) return new(null, 400, "Falha ao atualizar");
+
+                foreach (AccountsReceivable account in list.Data)
+                {
+                    UpdateAccountsReceivableDTO accountsReceivable = new ()
+                    {
+                        ContractId = customerContract.Id,
+                        Value = customerContract.Total,
+                        LowDate = account.LowDate,
+                        LowValue = account.LowValue,
+                        CustomerId = customerContract.ContractorId,
+                        Id = account.Id,
+                        Code = account.Code
+                    };
+
+                    await accountsReceivableService.UpdateAsync(accountsReceivable);
+                }
+                
+            };
             
             return new(response.Data, 201, "Atualizado com sucesso");
         }
@@ -120,5 +205,44 @@ namespace api_slim.src.Services
         }
     }
     #endregion 
+    #region FUNCTION
+    public static DateTime? NextDueDate(string billingPeriod, DateTime? currentDueDate)
+    {
+        if (currentDueDate == null) return null;
+
+        return billingPeriod switch
+        {
+            "Mensal" => currentDueDate.Value.AddMonths(1),
+            "Semanal" => currentDueDate.Value.AddDays(7),
+            "Anual" => currentDueDate.Value.AddYears(1),
+            _ => currentDueDate
+        };
+    }
+    public static DateTime? NextBillingDate(string billingPeriod, DateTime? currentDueDate, string billingDay)
+    {
+        if (currentDueDate == null || string.IsNullOrEmpty(billingDay)) return currentDueDate;
+
+        switch (billingPeriod)
+        {
+            case "Mensal":
+                int day = Convert.ToInt32(billingDay);
+                int lastDayOfMonth = DateTime.DaysInMonth(currentDueDate.Value.Year, currentDueDate.Value.Month);
+                int safeDay = Math.Min(day, lastDayOfMonth);
+                
+                return new DateTime(currentDueDate.Value.Year, currentDueDate.Value.Month, safeDay);
+
+            case "Anual":
+                var spl = billingDay.Split("-");
+                int lastDayOfAnualMonth = DateTime.DaysInMonth(Convert.ToInt32(spl[0]), Convert.ToInt32(spl[1]));
+                return new DateTime(currentDueDate.Value.Year, currentDueDate.Value.Month, Math.Min(Convert.ToInt32(spl[2]), lastDayOfAnualMonth));
+
+            case "Semanal":
+                return currentDueDate;
+
+            default:
+                return currentDueDate;
+        }
+    }
+    #endregion
 }
 }

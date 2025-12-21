@@ -10,6 +10,7 @@ public interface IServiceModuleService
     Task<ResponseApi<dynamic?>> GetByIdAggregateAsync(string id);
     Task<ResponseApi<ServiceModule?>> CreateAsync(CreateServiceModuleDTO request);
     Task<ResponseApi<ServiceModule?>> UpdateAsync(UpdateServiceModuleDTO request);
+    Task<ResponseApi<ServiceModule?>> UpdateImageAsync(UpdateServiceModuleDTO request);
     Task<ResponseApi<ServiceModule>> DeleteAsync(string id);
 }
 }

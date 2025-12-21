@@ -21,6 +21,7 @@ namespace api_slim.src.Repository
                 new("$addFields", new BsonDocument
                 {
                     {"id", new BsonDocument("$toString", "$_id")},
+                    { "uri", "$image" }
                 }),
                 new("$match", pagination.PipelineFilter),
                 new("$sort", pagination.PipelineSort),
@@ -77,6 +78,19 @@ namespace api_slim.src.Repository
         {
             ServiceModule? serviceModule = await context.ServiceModules.Find(x => x.Id == id && !x.Deleted).FirstOrDefaultAsync();
             return new(serviceModule);
+        }
+        catch
+        {
+            return new(null, 500, "Falha ao buscar Módulo de Serviço");
+        }
+    }
+    
+    public async Task<ResponseApi<List<ServiceModule>>> GetByPlanIdAsync(string planId)
+    {
+        try
+        {
+            List<ServiceModule> serviceModules = await context.ServiceModules.Find(x => x.PlanId == planId && !x.Deleted).ToListAsync();
+            return new(serviceModules);
         }
         catch
         {

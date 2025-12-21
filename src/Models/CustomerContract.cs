@@ -34,11 +34,20 @@ namespace api_slim.src.Models
         [BsonElement("sellerId")]
         public string SellerId { get; set; } = string.Empty;
      
-        [BsonElement("serviceModuleId")]
-        public string ServiceModuleId { get; set; } = string.Empty;
+        [BsonElement("planId")]
+        public string PlanId { get; set; } = string.Empty;
+        
+        [BsonElement("serviceModuleIds")]
+        public List<string> ServiceModuleIds { get; set; } = [];
 
-        [BsonElement("value")]
-        public decimal Value { get; set; }
+        [BsonElement("subTotal")]
+        public decimal SubTotal { get; set; }
+
+        [BsonElement("total")]
+        public decimal Total { get; set; }
+
+        [BsonElement("discount")]
+        public decimal Discount { get; set; }
 
         [BsonElement("paymentMethod")]
         public string PaymentMethod { get; set; } = string.Empty;
@@ -65,8 +74,10 @@ namespace api_slim.src.Models
         public string Recurrence { get; set; } = string.Empty;
 
         [BsonElement("recurrencePeriod")]
-        // public DateTime? RecurrencePeriod { get; set; }
         public string RecurrencePeriod { get; set; } = string.Empty;
+
+        [BsonElement("endRecurrence")]
+        public DateTime? EndRecurrence { get; set; }
 
         [BsonElement("dueDate")]
         public DateTime? DueDate { get; set; }

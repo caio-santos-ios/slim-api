@@ -165,18 +165,40 @@ namespace api_slim.src.Repository
                         { "preserveNullAndEmptyArrays", true }
                     }),
 
+                    new BsonDocument("$addFields", new BsonDocument
+                    {
+                        {"total", new BsonDocument("$sum", new BsonArray 
+                            { 
+                                new BsonDocument("$toDouble", "$fees"), 
+                                new BsonDocument("$toDouble", "$fines"),
+                                new BsonDocument("$toDouble", "$value"),
+                            }) 
+                        },
+                       
+                    }),
+
                     new("$project", new BsonDocument
                     {
                         {"_id", 0},
                         {"id", new BsonDocument("$toString", "$_id")},
                         {"value", 1},
                         {"lowValue", 1},
+                        {"code", 1},
+                        {"balance", new BsonDocument("$subtract", new BsonArray 
+                            { 
+                                new BsonDocument("$toDouble", "$total"), 
+                                new BsonDocument("$toDouble", "$lowValue") 
+                            }) 
+                        },
+                        {"total", 1},
+                        {"fees", 1},
+                        {"fines", 1},                        
+                        {"dueDate", 1},                        
                         {"customerName", new BsonDocument("$ifNull", new BsonArray {"$_customer.corporateName" , "" })},
                         {"contractCode", new BsonDocument("$ifNull", new BsonArray {"$_contract.code" , "" })},
                         {"categoryDescription", new BsonDocument("$ifNull", new BsonArray { "$_category.description", "" })},
                         {"costCenterDescription", new BsonDocument("$ifNull", new BsonArray { "$_costCenter.description", "" })},
                         {"paymentMethodDescription", new BsonDocument("$ifNull", new BsonArray { "$_payment_method.description", "" })},
-
                     }),
                     new("$sort", pagination.PipelineSort),
                 };
@@ -185,9 +207,9 @@ namespace api_slim.src.Repository
                 List<dynamic> list = results.Select(doc => BsonSerializer.Deserialize<dynamic>(doc)).ToList();
                 return new(list);
             }
-            catch(Exception e)
+            catch
             {
-                return new(null, 500, e.Message); ;
+                return new(null, 500, "Falha ao buscar Contas a Receber"); ;
             }
         }
         public async Task<ResponseApi<dynamic?>> GetByIdAggregateAsync(string id)
@@ -227,6 +249,30 @@ namespace api_slim.src.Repository
             catch
             {
                 return new(null, 500, "Falha ao buscar Contas a Receber"); ;
+            }
+        }
+        public async Task<ResponseApi<List<AccountsReceivable>>> GetByContractId(string contractId)
+        {
+            try
+            {
+                List<AccountsReceivable> accountsReceivable = await context.AccountsReceivables.Find(x => x.ContractId == contractId && !x.Deleted).ToListAsync();
+                return new(accountsReceivable);
+            }
+            catch
+            {
+                return new(null, 500, "Falha ao buscar Contas a Receber"); ;
+            }
+        }
+        public async Task<ResponseApi<long>> GetNextCodeAsync()
+        {
+            try
+            {
+                long count = await context.AccountsReceivables.Find(x => true).CountDocumentsAsync();
+                return new(count);
+            }
+            catch
+            {
+                return new(0, 500, "Falha ao buscar novo código");
             }
         }
         public async Task<int> GetCountDocumentsAsync(PaginationUtil<AccountsReceivable> pagination)
@@ -282,6 +328,19 @@ namespace api_slim.src.Repository
             catch
             {
                 return new(null, 500, "Falha ao atualizar Contas a Receber");
+            }
+        }
+        public async Task<ResponseApi<AccountsReceivable?>> UpdateLowAsync(AccountsReceivable accountsReceivable)
+        {
+            try
+            {
+                await context.AccountsReceivables.ReplaceOneAsync(x => x.Id == accountsReceivable.Id, accountsReceivable);
+
+                return new(accountsReceivable, 201, "Baixa feita com sucesso");
+            }
+            catch
+            {
+                return new(null, 500, "Falha ao dar baixa na Conta a Receber");
             }
         }
         #endregion

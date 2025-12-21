@@ -10,6 +10,9 @@ namespace api_slim.src.Models
         [BsonRepresentation(BsonType.ObjectId)]
         public string Id { get; set; } = string.Empty;
         
+        [BsonElement("code")]
+        public string Code {get;set;} = string.Empty;
+
         [BsonElement("customerId")]
         public string CustomerId {get;set;} = string.Empty;
 
@@ -21,8 +24,20 @@ namespace api_slim.src.Models
 
         [BsonElement("lowValue")]
         public decimal LowValue {get;set;} = 0;
+    
+        [BsonElement("fines")]
+        public decimal Fines {get;set;} = 0;
+        
+        [BsonElement("fees")]
+        public decimal Fees {get;set;} = 0;
         
         [BsonElement("lowDate")]
         public DateTime? LowDate { get; set; }
+       
+        [BsonElement("dueDate")]
+        public DateTime? DueDate { get; set; }
+        
+        [BsonElement("billingDate")]
+        public DateTime? BillingDate { get; set; }
     }
 }

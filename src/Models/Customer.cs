@@ -52,9 +52,6 @@ namespace api_slim.src.Models
         [BsonElement("effectiveDate")]
         public DateTime? EffectiveDate { get; set; }
 
-        [BsonElement("planId")]
-        public string PlanId { get; set; } = string.Empty; 
-
         [BsonElement("notes")]
         public string Notes { get; set; } = string.Empty;
        

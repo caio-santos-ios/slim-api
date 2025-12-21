@@ -29,7 +29,8 @@ public class ServiceModuleController(IServiceModuleService serviceModuleService)
     
     [Authorize]
     [HttpPost]
-    public async Task<IActionResult> Create([FromBody] CreateServiceModuleDTO serviceModule)
+    [Consumes("multipart/form-data")]
+    public async Task<IActionResult> Create([FromForm] CreateServiceModuleDTO serviceModule)
     {
         if (serviceModule == null) return BadRequest("Dados inválidos.");
 
@@ -40,13 +41,26 @@ public class ServiceModuleController(IServiceModuleService serviceModuleService)
     
     [Authorize]
     [HttpPut]
-    public async Task<IActionResult> Update([FromBody] UpdateServiceModuleDTO serviceModule)
+    [Consumes("multipart/form-data")]
+    public async Task<IActionResult> Update([FromForm] UpdateServiceModuleDTO serviceModule)
     {
         if (serviceModule == null) return BadRequest("Dados inválidos.");
 
         ResponseApi<ServiceModule?> response = await serviceModuleService.UpdateAsync(serviceModule);
 
         return StatusCode(response.StatusCode, new { response.Message });
+    }
+
+   [Authorize]
+    [HttpPut("save-image")]
+    [Consumes("multipart/form-data")]
+    public async Task<IActionResult> UpdateImage([FromForm] UpdateServiceModuleDTO serviceModule)
+    {
+        if (serviceModule == null) return BadRequest("Dados inválidos.");
+
+        ResponseApi<ServiceModule?> response = await serviceModuleService.UpdateImageAsync(serviceModule);
+
+        return StatusCode(response.StatusCode, new { response.Message, response.Result });
     }
     
     [Authorize]

@@ -1,6 +1,5 @@
 using api_slim.src.Configuration;
 using DotNetEnv;
-using Microsoft.Extensions.FileProviders;
 
 WebApplicationBuilder builder = WebApplication.CreateBuilder(args);
 
