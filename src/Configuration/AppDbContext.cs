@@ -101,12 +101,20 @@ namespace api_slim.src.Configuration
         {
             get { return Database.GetCollection<CustomerContract>("customer_contracts"); }
         }
+        public IMongoCollection<Supplier> Suppliers
+        {
+            get { return Database.GetCollection<Supplier>("suppliers"); }
+        }
         #endregion
 
         #region FIN
         public IMongoCollection<AccountsReceivable> AccountsReceivables
         {
             get { return Database.GetCollection<AccountsReceivable>("accounts_receivables"); }
+        }
+        public IMongoCollection<AccountsPayable> AccountsPayables
+        {
+            get { return Database.GetCollection<AccountsPayable>("accounts_payables"); }
         }
         #endregion
     }

@@ -9,10 +9,10 @@ using MongoDB.Driver;
 
 namespace api_slim.src.Repository
 {
-    public class AccreditedNetworkRepository(AppDbContext context) : IAccreditedNetworkRepository
+    public class SupplierRepository(AppDbContext context) : ISupplierRepository
     {
         #region READ
-        public async Task<ResponseApi<List<dynamic>>> GetAllAsync(PaginationUtil<AccreditedNetwork> pagination)
+        public async Task<ResponseApi<List<dynamic>>> GetAllAsync(PaginationUtil<Supplier> pagination)
         {
             try
             {
@@ -33,13 +33,13 @@ namespace api_slim.src.Repository
                     new("$sort", pagination.PipelineSort),
                 };
 
-                List<BsonDocument> results = await context.AccreditedNetworks.Aggregate<BsonDocument>(pipeline).ToListAsync();
+                List<BsonDocument> results = await context.Suppliers.Aggregate<BsonDocument>(pipeline).ToListAsync();
                 List<dynamic> list = results.Select(doc => BsonSerializer.Deserialize<dynamic>(doc)).ToList();
                 return new(list);
             }
             catch
             {
-                return new(null, 500, "Falha ao buscar Items");
+                return new(null, 500, "Falha ao buscar Fornecedores");
             }
         }
         
@@ -74,7 +74,7 @@ namespace api_slim.src.Repository
                                             new BsonDocument("$eq", new BsonArray
                                             {
                                                 "$parent",
-                                                "accredited-network"
+                                                "supplier"
                                             })
                                         })
                                     }
@@ -109,30 +109,59 @@ namespace api_slim.src.Repository
                     }),
                 ];
 
-                BsonDocument? response = await context.AccreditedNetworks.Aggregate<BsonDocument>(pipeline).FirstOrDefaultAsync();
+                BsonDocument? response = await context.Suppliers.Aggregate<BsonDocument>(pipeline).FirstOrDefaultAsync();
                 dynamic? result = response is null ? null : BsonSerializer.Deserialize<dynamic>(response);
-                return result is null ? new(null, 404, "Item não encontrado") : new(result);
+                return result is null ? new(null, 404, "Fornecedor não encontrado") : new(result);
             }
             catch
             {
-                return new(null, 500, "Falha ao buscar Item");
+                return new(null, 500, "Falha ao buscar Fornecedor");
             }
         }
         
-        public async Task<ResponseApi<AccreditedNetwork?>> GetByIdAsync(string id)
+        public async Task<ResponseApi<Supplier?>> GetByIdAsync(string id)
         {
             try
             {
-                AccreditedNetwork? billing = await context.AccreditedNetworks.Find(x => x.Id == id && !x.Deleted).FirstOrDefaultAsync();
+                Supplier? billing = await context.Suppliers.Find(x => x.Id == id && !x.Deleted).FirstOrDefaultAsync();
                 return new(billing);
             }
             catch
             {
-                return new(null, 500, "Falha ao buscar Item");
+                return new(null, 500, "Falha ao buscar Fornecedor");
             }
         }
         
-        public async Task<int> GetCountDocumentsAsync(PaginationUtil<AccreditedNetwork> pagination)
+        public async Task<ResponseApi<List<dynamic>>> GetSelectAsync(PaginationUtil<Supplier> pagination)
+        {
+            try
+            {
+                List<BsonDocument> pipeline = new()
+                {
+                    new("$match", pagination.PipelineFilter),
+                    new("$sort", pagination.PipelineSort),
+                    new("$skip", pagination.Skip),
+                    new("$limit", pagination.Limit),
+                    new("$project", new BsonDocument
+                    {
+                        {"_id", 0}, 
+                        {"id", new BsonDocument("$toString", "$_id")},
+                        {"tradeName", 1},
+                        {"corporateName", 1},
+                    }),
+                    new("$sort", pagination.PipelineSort),
+                };
+
+                List<BsonDocument> results = await context.Suppliers.Aggregate<BsonDocument>(pipeline).ToListAsync();
+                List<dynamic> list = results.Select(doc => BsonSerializer.Deserialize<dynamic>(doc)).ToList();
+                return new(list);
+            }
+            catch
+            {
+                return new(null, 500, "Falha ao buscar Fornecedores");
+            }
+        }
+        public async Task<int> GetCountDocumentsAsync(PaginationUtil<Supplier> pagination)
         {
             List<BsonDocument> pipeline = new()
             {
@@ -149,60 +178,60 @@ namespace api_slim.src.Repository
                 new("$sort", pagination.PipelineSort),
             };
 
-            List<BsonDocument> results = await context.AccreditedNetworks.Aggregate<BsonDocument>(pipeline).ToListAsync();
+            List<BsonDocument> results = await context.Suppliers.Aggregate<BsonDocument>(pipeline).ToListAsync();
             return results.Select(doc => BsonSerializer.Deserialize<dynamic>(doc)).Count();
         }
         #endregion
         
         #region CREATE
-        public async Task<ResponseApi<AccreditedNetwork?>> CreateAsync(AccreditedNetwork billing)
+        public async Task<ResponseApi<Supplier?>> CreateAsync(Supplier billing)
         {
             try
             {
-                await context.AccreditedNetworks.InsertOneAsync(billing);
+                await context.Suppliers.InsertOneAsync(billing);
 
-                return new(billing, 201, "Item criado com sucesso");
+                return new(billing, 201, "Fornecedor criado com sucesso");
             }
             catch
             {
-                return new(null, 500, "Falha ao criar Item");  
+                return new(null, 500, "Falha ao criar Fornecedor");  
             }
         }
         #endregion
         
         #region UPDATE
-        public async Task<ResponseApi<AccreditedNetwork?>> UpdateAsync(AccreditedNetwork billing)
+        public async Task<ResponseApi<Supplier?>> UpdateAsync(Supplier billing)
         {
             try
             {
-                await context.AccreditedNetworks.ReplaceOneAsync(x => x.Id == billing.Id, billing);
+                await context.Suppliers.ReplaceOneAsync(x => x.Id == billing.Id, billing);
 
-                return new(billing, 201, "Item atualizado com sucesso");
+                return new(billing, 201, "Fornecedor atualizado com sucesso");
             }
             catch
             {
-                return new(null, 500, "Falha ao atualizar Item");
+                return new(null, 500, "Falha ao atualizar Fornecedor");
             }
         }
         #endregion
         
         #region DELETE
-        public async Task<ResponseApi<AccreditedNetwork>> DeleteAsync(string id)
+        public async Task<ResponseApi<Supplier>> DeleteAsync(string id)
         {
             try
             {
-                AccreditedNetwork? billing = await context.AccreditedNetworks.Find(x => x.Id == id && !x.Deleted).FirstOrDefaultAsync();
-                if(billing is null) return new(null, 404, "Item não encontrado");
+                Supplier? billing = await context.Suppliers.Find(x => x.Id == id && !x.Deleted).FirstOrDefaultAsync();
+                if(billing is null) return new(null, 404, "Fornecedor não encontrado");
                 billing.Deleted = true;
                 billing.DeletedAt = DateTime.UtcNow;
 
-                await context.AccreditedNetworks.ReplaceOneAsync(x => x.Id == id, billing);
+                await context.Suppliers.ReplaceOneAsync(x => x.Id == id, billing);
 
-                return new(billing, 204, "Item excluído com sucesso");
+                return new(billing, 204, "Fornecedor excluído com sucesso");
             }
             catch
             {
-                return new(null, 500, "Falha ao excluír Item");
+                return new(null, 500, "Falha ao excluír Fornecedor");
             }
         }
         #endregion

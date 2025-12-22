@@ -62,10 +62,17 @@ namespace api_slim.src.Configuration
            
             CreateMap<CreateCustomerContractDTO, CustomerContract>().ReverseMap();
             CreateMap<UpdateCustomerContractDTO, CustomerContract>().ReverseMap();      
+           
+            CreateMap<CreateSupplierDTO, Supplier>().ReverseMap();
+            CreateMap<UpdateSupplierDTO, Supplier>().ReverseMap();      
             #endregion
 
+            #region FIN
             CreateMap<CreateAccountsReceivableDTO, AccountsReceivable>().ReverseMap();
             CreateMap<UpdateAccountsReceivableDTO, AccountsReceivable>().ReverseMap();
+            CreateMap<CreateAccountsPayableDTO, AccountsPayable>().ReverseMap();
+            CreateMap<UpdateAccountsPayableDTO, AccountsPayable>().ReverseMap();
+            #endregion
            
         }
     }

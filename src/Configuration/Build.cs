@@ -63,8 +63,12 @@ namespace api_slim.src.Configuration
             builder.Services.AddTransient<IAuthService, AuthService>();                  
             builder.Services.AddTransient<IUserService, UserService>();
             builder.Services.AddTransient<IUserRepository, UserRepository>();    
+            
             builder.Services.AddTransient<IAccountsReceivableService, AccountsReceivableService>();
             builder.Services.AddTransient<IAccountsReceivableRepository, AccountsReceivableRepository>();    
+            builder.Services.AddTransient<IAccountsPayableService, AccountsPayableService>();
+            builder.Services.AddTransient<IAccountsPayableRepository, AccountsPayableRepository>();    
+            
             builder.Services.AddTransient<IGenericTableService, GenericTableService>();
             builder.Services.AddTransient<IGenericTableRepository, GenericTableRepository>();                       
             builder.Services.AddTransient<IAccreditedNetworkService, AccreditedNetworkService>();
@@ -97,6 +101,8 @@ namespace api_slim.src.Configuration
             builder.Services.AddTransient<ICustomerRecipientRepository, CustomerRecipientRepository>();                  
             builder.Services.AddTransient<ICustomerContractService, CustomerContractService>();
             builder.Services.AddTransient<ICustomerContractRepository, CustomerContractRepository>();                  
+            builder.Services.AddTransient<ISupplierService, SupplierService>();
+            builder.Services.AddTransient<ISupplierRepository, SupplierRepository>();                  
 
             // Handlers
             builder.Services.AddTransient<SmsHandler>();
