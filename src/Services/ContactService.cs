@@ -30,7 +30,7 @@ namespace api_slim.src.Services
         try
         {
             ResponseApi<dynamic?> contact = await contactRepository.GetByIdAggregateAsync(id);
-            if(contact.Data is null) return new(null, 404, "Item não encontrado");
+            if(contact.Data is null) return new(null, 404, "Contato não encontrado");
             return new(contact.Data);
         }
         catch
@@ -48,8 +48,8 @@ namespace api_slim.src.Services
             Contact contact = _mapper.Map<Contact>(request);
             ResponseApi<Contact?> response = await contactRepository.CreateAsync(contact);
 
-            if(response.Data is null) return new(null, 400, "Falha ao criar Item.");
-            return new(response.Data, 201, "Item criado com sucesso.");
+            if(response.Data is null) return new(null, 400, "Falha ao criar Contato.");
+            return new(response.Data, 201, "Contato criado com sucesso.");
         }
         catch
         { 

@@ -7,7 +7,7 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace api_slim.src.Controllers
 {
-    [Route("api/accredited-network")]
+    [Route("api/accredited-networks")]
     [ApiController]
     public class AccreditedNetworkController(IAccreditedNetworkService accreditedNetworkService) : ControllerBase
     {
@@ -35,7 +35,7 @@ namespace api_slim.src.Controllers
 
             ResponseApi<AccreditedNetwork?> response = await accreditedNetworkService.CreateAsync(accreditedNetwork);
 
-            return StatusCode(response.StatusCode, new { response.Message });
+            return StatusCode(response.StatusCode, new { response.Message, response.Result });
         }
         
         [Authorize]
@@ -46,7 +46,7 @@ namespace api_slim.src.Controllers
 
             ResponseApi<AccreditedNetwork?> response = await accreditedNetworkService.UpdateAsync(accreditedNetwork);
 
-            return StatusCode(response.StatusCode, new { response.Message });
+            return StatusCode(response.StatusCode, new { response.Message, response.Result });
         }
         
         [Authorize]
@@ -55,7 +55,7 @@ namespace api_slim.src.Controllers
         {
             ResponseApi<AccreditedNetwork> response = await accreditedNetworkService.DeleteAsync(id);
 
-            return StatusCode(response.StatusCode, new { response.Message });
+            return StatusCode(response.StatusCode, new { response.Message, response.Result });
         }
     }
 }

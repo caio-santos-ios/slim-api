@@ -14,6 +14,9 @@ namespace api_slim.src.Configuration
             
             CreateMap<CreateAccreditedNetworkDTO, AccreditedNetwork>().ReverseMap();
             CreateMap<UpdateAccreditedNetworkDTO, AccreditedNetwork>().ReverseMap();
+           
+            CreateMap<CreateAccreditedNetworkResponsibleDTO, AccreditedNetworkResponsible>().ReverseMap();
+            CreateMap<CreateAccreditedNetworkResponsibleDTO, AccreditedNetworkResponsible>().ReverseMap();
             
             CreateMap<CreateAddressDTO, Address>().ReverseMap();
             CreateMap<UpdateAddressDTO, Address>().ReverseMap();

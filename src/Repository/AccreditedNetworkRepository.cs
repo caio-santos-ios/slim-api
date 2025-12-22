@@ -52,12 +52,60 @@ namespace api_slim.src.Repository
                     {"_id", new ObjectId(id)},
                     {"deleted", false}
                 }),
+
+                new BsonDocument("$lookup", new BsonDocument
+                {
+                    { "from", "addresses" },
+
+                    { "let", new BsonDocument("id", new BsonDocument("$toString", "$_id")) },
+
+                    { "pipeline", new BsonArray
+                        {
+                            new BsonDocument("$match", new BsonDocument
+                            {
+                                { "$expr", new BsonDocument("$and", new BsonArray
+                                    {
+                                        new BsonDocument("$eq", new BsonArray
+                                        {
+                                            "$parentId",
+                                            "$$id"
+                                        }),
+
+                                        new BsonDocument("$eq", new BsonArray
+                                        {
+                                            "$parent",
+                                            "accredited-network"
+                                        })
+                                    })
+                                }
+                            })
+                        }
+                    },
+
+                    { "as", "_address" }
+                }),
+                
+                new("$addFields", new BsonDocument {
+                    {"id", new BsonDocument("$toString", "$_id")},
+                    {"address", new BsonDocument
+                        {
+                            {"id", new BsonDocument("$toString", new BsonDocument("$first", "$_address._id"))},
+                            {"street", new BsonDocument("$first", "$_address.street")},
+                            {"number", new BsonDocument("$first", "$_address.number")},
+                            {"complement", new BsonDocument("$first", "$_address.complement")},
+                            {"neighborhood", new BsonDocument("$first", "$_address.neighborhood")},
+                            {"city", new BsonDocument("$first", "$_address.city")},
+                            {"state", new BsonDocument("$first", "$_address.state")},
+                            {"zipCode", new BsonDocument("$first", "$_address.zipCode")},
+                            {"parent", new BsonDocument("$first", "$_address.parent")},
+                            {"parentId", new BsonDocument("$first", "$_address.parentId")},
+                        }
+                    }
+                }),
+
                 new("$project", new BsonDocument
                 {
                     {"_id", 0},
-                    {"id", new BsonDocument("$toString", "$_id")},
-                    {"name", 1},
-                    {"description", 1}
                 }),
             ];
 

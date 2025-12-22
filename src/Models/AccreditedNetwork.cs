@@ -14,7 +14,7 @@ namespace api_slim.src.Models
         public string CNPJ { get; set; } = string.Empty;
         
         [BsonElement("tradeName")]
-        public string tradeName { get; set; } = string.Empty;
+        public string TradeName { get; set; } = string.Empty;
 
         [BsonElement("corporateName")]
         public string CorporateName { get; set; } = string.Empty;
@@ -24,6 +24,9 @@ namespace api_slim.src.Models
 
         [BsonElement("whatsapp")]
         public string Whatsapp { get; set; } = string.Empty;
+        
+        [BsonElement("email")]
+        public string Email { get; set; } = string.Empty;
        
         [BsonElement("notes")]
         public string Notes { get; set; } = string.Empty;
@@ -37,25 +40,41 @@ namespace api_slim.src.Models
         [BsonElement("consumptionLimit")]
         public decimal ConsumptionLimit { get; set; }
         
-        [BsonElement("tradingYable")]
-        public TradingYable TradingYable { get; set; } = new();
+        [BsonElement("tradingTable")]
+        public string TradingTable { get; set; } = string.Empty;
+        
+        [BsonElement("responsible")]
+        public AccreditedNetworkResponsible Responsible { get; set; } = new();
     }
     
-    public class TradingYable 
+    public class AccreditedNetworkResponsible
     {
-        [BsonElement("procedureId")]
-        public string ProcedureId { get; set; } = string.Empty;
 
-        [BsonElement("value")]
-        public decimal Value { get; set; }
+        [BsonElement("dateOfBirth")]
+        public DateTime? DateOfBirth { get; set; }
+
+        [BsonElement("gender")]
+        public string Gender { get; set; } = string.Empty;
+
+        [BsonElement("name")]
+        public string Name { get; set; } = string.Empty;
+
+        [BsonElement("cpf")]
+        public string Cpf { get; set; } = string.Empty;
+
+        [BsonElement("rg")]
+        public string Rg { get; set; } = string.Empty;
+
+        [BsonElement("phone")]
+        public string Phone { get; set; } = string.Empty;
+
+        [BsonElement("whatsapp")]
+        public string Whatsapp { get; set; } = string.Empty;
+
+        [BsonElement("notes")]
+        public string Notes { get; set; } = string.Empty;
         
-        [BsonElement("discountPercentage")]
-        public decimal DiscountPercentage { get; set; }
-        
-        [BsonElement("discountValue")]
-        public decimal DiscountValue { get; set; }
-      
-        [BsonElement("finalValue")]
-        public decimal FinalValue { get; set; }
+        [BsonElement("email")]
+        public string Email { get; set; } = string.Empty;
     }
 }

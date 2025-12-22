@@ -7,7 +7,7 @@ using AutoMapper;
 
 namespace api_slim.src.Services
 {
-    public class AccreditedNetworkService(IAccreditedNetworkRepository billingRepository, IMapper _mapper) : IAccreditedNetworkService
+    public class AccreditedNetworkService(IAccreditedNetworkRepository accreditedNetwork, IAddressRepository addressRepository, IMapper _mapper) : IAccreditedNetworkService
 {
     #region READ
     public async Task<PaginationApi<List<dynamic>>> GetAllAsync(GetAllDTO request)
@@ -15,9 +15,9 @@ namespace api_slim.src.Services
         try
         {
             PaginationUtil<AccreditedNetwork> pagination = new(request.QueryParams);
-            ResponseApi<List<dynamic>> billings = await billingRepository.GetAllAsync(pagination);
-            int count = await billingRepository.GetCountDocumentsAsync(pagination);
-            return new(billings.Data, count, pagination.PageNumber, pagination.PageSize);
+            ResponseApi<List<dynamic>> accrediteds = await accreditedNetwork.GetAllAsync(pagination);
+            int count = await accreditedNetwork.GetCountDocumentsAsync(pagination);
+            return new(accrediteds.Data, count, pagination.PageNumber, pagination.PageSize);
         }
         catch
         {
@@ -29,9 +29,9 @@ namespace api_slim.src.Services
     {
         try
         {
-            ResponseApi<dynamic?> billing = await billingRepository.GetByIdAggregateAsync(id);
-            if(billing.Data is null) return new(null, 404, "Item não encontrado");
-            return new(billing.Data);
+            ResponseApi<dynamic?> accredited = await accreditedNetwork.GetByIdAggregateAsync(id);
+            if(accredited.Data is null) return new(null, 404, "Rede Credenciada não encontrado");
+            return new(accredited.Data);
         }
         catch
         {
@@ -45,11 +45,30 @@ namespace api_slim.src.Services
     {
         try
         {
-            AccreditedNetwork billing = _mapper.Map<AccreditedNetwork>(request);
-            ResponseApi<AccreditedNetwork?> response = await billingRepository.CreateAsync(billing);
+            AccreditedNetwork accredited = _mapper.Map<AccreditedNetwork>(request);
+            ResponseApi<AccreditedNetwork?> response = await accreditedNetwork.CreateAsync(accredited);
 
-            if(response.Data is null) return new(null, 400, "Falha ao criar Item.");
-            return new(response.Data, 201, "Item criado com sucesso.");
+            if(response.Data is null) return new(null, 400, "Falha ao criar Rede Credenciada.");
+
+            if(!string.IsNullOrEmpty(request.Address.Id))
+            {
+                ResponseApi<Address?> findAddress = await addressRepository.GetByParentIdAsync(request.Address.ParentId, request.Address.Parent);
+                if(!findAddress.IsSuccess || findAddress.Data is null) return new(null, 400, "Falha ao atualizar.");
+                
+                request.Address.Id = findAddress.Data.Id;
+            
+                ResponseApi<Address?> addressResponse = await addressRepository.UpdateAsync(request.Address);
+                if(!addressResponse.IsSuccess) return new(null, 400, "Falha ao atualizar.");
+            }
+            else
+            {
+                Address address = _mapper.Map<Address>(request.Address);
+                address.ParentId = response.Data.Id;
+                ResponseApi<Address?> addressResponse = await addressRepository.CreateAsync(address);
+                if(!addressResponse.IsSuccess) return new(null, 400, "Falha ao criar Rede Credenciada.");
+            };
+
+            return new(response.Data, 201, "Rede Credenciada criado com sucesso.");
         }
         catch
         { 
@@ -63,14 +82,50 @@ namespace api_slim.src.Services
     {
         try
         {
-            ResponseApi<AccreditedNetwork?> billingResponse = await billingRepository.GetByIdAsync(request.Id);
-            if(billingResponse.Data is null) return new(null, 404, "Falha ao atualizar");
+            ResponseApi<AccreditedNetwork?> accreditedResponse = await accreditedNetwork.GetByIdAsync(request.Id);
+            if(accreditedResponse.Data is null) return new(null, 404, "Falha ao atualizar");
             
-            AccreditedNetwork billing = _mapper.Map<AccreditedNetwork>(request);
-            billing.UpdatedAt = DateTime.UtcNow;
+            AccreditedNetwork accredited = _mapper.Map<AccreditedNetwork>(request);
+            accredited.UpdatedAt = DateTime.UtcNow;
+            accredited.CreatedAt = accreditedResponse.Data.CreatedAt;
 
-            ResponseApi<AccreditedNetwork?> response = await billingRepository.UpdateAsync(billing);
+            ResponseApi<AccreditedNetwork?> response = await accreditedNetwork.UpdateAsync(accredited);
             if(!response.IsSuccess) return new(null, 400, "Falha ao atualizar");
+
+            if(!string.IsNullOrEmpty(request.Address.Id))
+            {
+                ResponseApi<Address?> findAddress = await addressRepository.GetByParentIdAsync(request.Address.ParentId, request.Address.Parent);
+                if(!findAddress.IsSuccess || findAddress.Data is null) return new(null, 400, "Falha ao atualizar.");
+                
+                request.Address.Id = findAddress.Data.Id;
+            
+                ResponseApi<Address?> addressResponse = await addressRepository.UpdateAsync(request.Address);
+                if(!addressResponse.IsSuccess) return new(null, 400, "Falha ao atualizar.");
+            }
+            else
+            {
+                Address address = _mapper.Map<Address>(request.Address);
+                ResponseApi<Address?> addressResponse = await addressRepository.CreateAsync(address);
+                if(!addressResponse.IsSuccess) return new(null, 400, "Falha ao criar Item.");
+            };
+
+            if(!string.IsNullOrEmpty(request.Responsible.Address.Id))
+            {
+                ResponseApi<Address?> findAddress = await addressRepository.GetByParentIdAsync(request.Responsible.Address.ParentId, request.Responsible.Address.Parent);
+                if(!findAddress.IsSuccess || findAddress.Data is null) return new(null, 400, "Falha ao atualizar.");
+                
+                request.Responsible.Address.Id = findAddress.Data.Id;
+            
+                ResponseApi<Address?> addressResponse = await addressRepository.UpdateAsync(request.Responsible.Address);
+                if(!addressResponse.IsSuccess) return new(null, 400, "Falha ao atualizar.");
+            }
+            else
+            {
+                Address address = _mapper.Map<Address>(request.Responsible.Address);
+                ResponseApi<Address?> addressResponse = await addressRepository.CreateAsync(address);
+                if(!addressResponse.IsSuccess) return new(null, 400, "Falha ao criar Rede Credenciada.");
+            };
+
             return new(response.Data, 201, "Atualizado com sucesso");
         }
         catch
@@ -85,8 +140,8 @@ namespace api_slim.src.Services
     {
         try
         {
-            ResponseApi<AccreditedNetwork> billing = await billingRepository.DeleteAsync(id);
-            if(!billing.IsSuccess) return new(null, 400, billing.Message);
+            ResponseApi<AccreditedNetwork> accredited = await accreditedNetwork.DeleteAsync(id);
+            if(!accredited.IsSuccess) return new(null, 400, accredited.Message);
             return new(null, 204, "Excluído com sucesso");
         }
         catch

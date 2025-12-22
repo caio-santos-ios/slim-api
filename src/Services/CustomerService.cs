@@ -125,8 +125,6 @@ namespace api_slim.src.Services
             else
             {
                 Address address = _mapper.Map<Address>(request.Address);
-                // address.Parent = "customer-contract";
-                // address.ParentId = response.Data!.Id;
                 ResponseApi<Address?> addressResponse = await addressRepository.CreateAsync(address);
                 if(!addressResponse.IsSuccess) return new(null, 400, "Falha ao criar Item.");
             };

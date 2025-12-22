@@ -148,8 +148,6 @@ namespace api_slim.src.Models
         
         [BsonElement("email")]
         public string Email { get; set; } = string.Empty;
-        // [BsonElement("address")]
-        // public Address Address { get; set; } = new Address();
     }
 
     public class Recipient
