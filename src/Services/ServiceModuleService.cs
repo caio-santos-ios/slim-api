@@ -39,6 +39,19 @@ namespace api_slim.src.Services
             return new(null, 500, "Ocorreu um erro inesperado. Por favor, tente novamente mais tarde.");
         }
     }
+    public async Task<ResponseApi<List<dynamic>>> GetSelectAsync(GetAllDTO request)
+    {
+        try
+        {
+            PaginationUtil<ServiceModule> pagination = new(request.QueryParams);
+            ResponseApi<List<dynamic>> serviceModules = await serviceModuleRepository.GetAllAsync(pagination);
+            return new(serviceModules.Data);
+        }
+        catch
+        {
+            return new(null, 500, "Ocorreu um erro inesperado. Por favor, tente novamente mais tarde.");
+        }
+    }
     #endregion
     
     #region CREATE

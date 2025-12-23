@@ -36,18 +36,13 @@ namespace api_slim.src.Repository
                     new("$sort", pagination.PipelineSort),
                     new("$skip", pagination.Skip),
                     new("$limit", pagination.Limit),
-                    new("$addFields", new BsonDocument
-                    {
-                        {"id", new BsonDocument("$toString", "$_id")},
-                    }),
+                    
                     new("$project", new BsonDocument
                     {
                         {"_id", 0},
-                        {"password", 0},
-                        {"role", 0},
-                        {"blocked", 0},
-                        {"codeAccess", 0},
-                        {"validatedAccess", 0}
+                        {"id", new BsonDocument("$toString", "$_id")},
+                        {"name", 1},
+                        {"email", 1},
                     }),
                     new("$sort", pagination.PipelineSort),
                 };
@@ -73,11 +68,10 @@ namespace api_slim.src.Repository
                     new("$limit", pagination.Limit),
                     new("$project", new BsonDocument
                     {
-                        {"_id", 0},
                         {"id", new BsonDocument("$toString", "$_id")},
                         {"name", 1},
-                        {"role", 1},
-                        {"createdAt", 1},
+                        {"email", 1},
+                        {"modules", 1},
                     }),
                     new("$sort", pagination.PipelineSort),
                 };
@@ -105,7 +99,8 @@ namespace api_slim.src.Repository
                         {"_id", 0},
                         {"id", new BsonDocument("$toString", "$_id")},
                         {"name", 1},
-                        {"photo", 1}
+                        {"email", 1},
+                        {"modules", 1},
                     }),
                 ];
 

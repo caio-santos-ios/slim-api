@@ -73,7 +73,11 @@ namespace api_slim.src.Configuration
             CreateMap<CreateAccountsPayableDTO, AccountsPayable>().ReverseMap();
             CreateMap<UpdateAccountsPayableDTO, AccountsPayable>().ReverseMap();
             #endregion
-           
+
+            #region SERVICE
+            CreateMap<CreateInPersonDTO, InPerson>().ReverseMap();
+            CreateMap<UpdateInPersonDTO, InPerson>().ReverseMap();
+            #endregion
         }
     }
 }

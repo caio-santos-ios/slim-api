@@ -117,5 +117,12 @@ namespace api_slim.src.Configuration
             get { return Database.GetCollection<AccountsPayable>("accounts_payables"); }
         }
         #endregion
+
+        #region SERVICE
+        public IMongoCollection<InPerson> InPersons
+        {
+            get { return Database.GetCollection<InPerson>("in_person"); }
+        }
+        #endregion
     }
 }

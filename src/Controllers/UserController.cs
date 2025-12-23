@@ -12,21 +12,21 @@ namespace api_slim.src.Controllers
     [ApiController]
     public class UserController(IUserService userService) : ControllerBase
     {
-        // [Authorize]
+        [Authorize]
         [HttpGet]
         public async Task<IActionResult> GetAll()
         {
             string userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value ?? "";
-            PaginationApi<List<dynamic>> users = await userService.GetAllAsync(new(Request.Query), userId);
-            return users.IsSuccess ? Ok(users) : BadRequest(new{ users.Message});
+            PaginationApi<List<dynamic>> response = await userService.GetAllAsync(new(Request.Query), userId);
+             return StatusCode(response.StatusCode, new { response.Message, response.Result });
         }
         
         [Authorize]
         [HttpGet("{id}")]
         public async Task<IActionResult> GetByIdAsync(string id)
         {
-            ResponseApi<dynamic?> user = await userService.GetByIdAggregateAsync(id);
-            return user.IsSuccess ? Ok(user) : BadRequest(new{ user.Message });
+            ResponseApi<dynamic?> response = await userService.GetByIdAggregateAsync(id);
+            return StatusCode(response.StatusCode, new { response.Message, response.Result });
         }
         
         [HttpPost]
@@ -36,7 +36,7 @@ namespace api_slim.src.Controllers
 
             ResponseApi<User?> response = await userService.CreateAsync(user);
 
-            return response.IsSuccess ? Ok(new{response.Message}) : BadRequest(new{response.Message});
+            return StatusCode(response.StatusCode, new { response.Message, response.Result });
         }
         
         [Authorize]
@@ -47,7 +47,18 @@ namespace api_slim.src.Controllers
 
             ResponseApi<User?> response = await userService.UpdateAsync(user);
 
-            return response.IsSuccess ? Ok(new{response.Message}) : BadRequest(new{response.Message});
+             return StatusCode(response.StatusCode, new { response.Message, response.Result });
+        }
+        
+        [Authorize]
+        [HttpPut("modules")]
+        public async Task<IActionResult> UpdateModules([FromBody] UpdateUserDTO user)
+        {
+            if (user == null) return BadRequest("Dados inválidos.");
+
+            ResponseApi<User?> response = await userService.UpdateModuleAsync(user);
+
+             return StatusCode(response.StatusCode, new { response.Message, response.Result });
         }
         
         [HttpPut("code-access")]

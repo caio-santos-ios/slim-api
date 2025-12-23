@@ -10,6 +10,7 @@ namespace api_slim.src.Interfaces
         Task<ResponseApi<dynamic?>> GetByIdAggregateAsync(string id);
         Task<ResponseApi<Procedure?>> GetByIdAsync(string id);
         Task<ResponseApi<long>> GetNextCodeAsync();
+        Task<ResponseApi<List<dynamic>>> GetSelectAsync(PaginationUtil<Procedure> pagination);
         Task<int> GetCountDocumentsAsync(PaginationUtil<Procedure> pagination);
         Task<ResponseApi<Procedure?>> CreateAsync(Procedure procedure);
         Task<ResponseApi<Procedure?>> UpdateAsync(Procedure procedure);

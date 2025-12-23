@@ -10,6 +10,7 @@ namespace api_slim.src.Interfaces
         Task<ResponseApi<List<dynamic>>> GetSelectBarberAsync(GetAllDTO request);
         Task<ResponseApi<api_slim.src.Models.User?>> CreateAsync(CreateUserDTO user);
         Task<ResponseApi<api_slim.src.Models.User?>> UpdateAsync(UpdateUserDTO user);
+        Task<ResponseApi<api_slim.src.Models.User?>> UpdateModuleAsync(UpdateUserDTO user);
         Task<ResponseApi<api_slim.src.Models.User?>> SavePhotoProfileAsync(SaveUserPhotoDTO user);
         Task<ResponseApi<api_slim.src.Models.User?>> ResendCodeAccessAsync(UpdateUserDTO user);
         Task<ResponseApi<api_slim.src.Models.User?>> RemovePhotoProfileAsync(string id);

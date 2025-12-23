@@ -7,9 +7,9 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace api_slim.src.Controllers
 {
-    [Route("api/accredited-networks")]
+    [Route("api/in-persons")]
     [ApiController]
-    public class AccreditedNetworkController(IAccreditedNetworkService service) : ControllerBase
+    public class InPersonController(IInPersonService service) : ControllerBase
     {
         [Authorize]
         [HttpGet]
@@ -28,31 +28,23 @@ namespace api_slim.src.Controllers
         }
         
         [Authorize]
-        [HttpGet("select")]
-        public async Task<IActionResult> GetSelectAsync()
-        {
-            ResponseApi<List<dynamic>> response = await service.GetSelectAsync(new(Request.Query));
-            return StatusCode(response.StatusCode, new { response.Message, response.Result });
-        }
-        
-        [Authorize]
         [HttpPost]
-        public async Task<IActionResult> Create([FromBody] CreateAccreditedNetworkDTO accreditedNetwork)
+        public async Task<IActionResult> Create([FromBody] CreateInPersonDTO accreditedNetwork)
         {
             if (accreditedNetwork == null) return BadRequest("Dados inválidos.");
 
-            ResponseApi<AccreditedNetwork?> response = await service.CreateAsync(accreditedNetwork);
+            ResponseApi<InPerson?> response = await service.CreateAsync(accreditedNetwork);
 
             return StatusCode(response.StatusCode, new { response.Message, response.Result });
         }
         
         [Authorize]
         [HttpPut]
-        public async Task<IActionResult> Update([FromBody] UpdateAccreditedNetworkDTO accreditedNetwork)
+        public async Task<IActionResult> Update([FromBody] UpdateInPersonDTO accreditedNetwork)
         {
             if (accreditedNetwork == null) return BadRequest("Dados inválidos.");
 
-            ResponseApi<AccreditedNetwork?> response = await service.UpdateAsync(accreditedNetwork);
+            ResponseApi<InPerson?> response = await service.UpdateAsync(accreditedNetwork);
 
             return StatusCode(response.StatusCode, new { response.Message, response.Result });
         }
@@ -61,7 +53,7 @@ namespace api_slim.src.Controllers
         [HttpDelete("{id}")]
         public async Task<IActionResult> Delete(string id)
         {
-            ResponseApi<AccreditedNetwork> response = await service.DeleteAsync(id);
+            ResponseApi<InPerson> response = await service.DeleteAsync(id);
 
             return StatusCode(response.StatusCode, new { response.Message, response.Result });
         }

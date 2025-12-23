@@ -2,7 +2,6 @@ using api_slim.src.Interfaces;
 using api_slim.src.Models;
 using api_slim.src.Models.Base;
 using api_slim.src.Shared.DTOs;
-using api_slim.src.Shared.Utils;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -10,13 +9,13 @@ namespace api_slim.src.Controllers
 {
     [Route("api/procedures")]
 [ApiController]
-public class ProcedureController(IProcedureService procedureService) : ControllerBase
+public class ProcedureController(IProcedureService service) : ControllerBase
 {
     [Authorize]
     [HttpGet]
     public async Task<IActionResult> GetAll()
     {
-        PaginationApi<List<dynamic>> response = await procedureService.GetAllAsync(new(Request.Query));
+        PaginationApi<List<dynamic>> response = await service.GetAllAsync(new(Request.Query));
         return StatusCode(response.StatusCode, new { response.Message, response.Result });
     }
     
@@ -24,7 +23,15 @@ public class ProcedureController(IProcedureService procedureService) : Controlle
     [HttpGet("{id}")]
     public async Task<IActionResult> GetByIdAsync(string id)
     {
-        ResponseApi<dynamic?> response = await procedureService.GetByIdAggregateAsync(id);
+        ResponseApi<dynamic?> response = await service.GetByIdAggregateAsync(id);
+        return StatusCode(response.StatusCode, new { response.Message, response.Result });
+    }
+
+    [Authorize]
+    [HttpGet("select")]
+    public async Task<IActionResult> GetSelectAsync()
+    {
+        ResponseApi<List<dynamic>> response = await service.GetSelectAsync(new(Request.Query));
         return StatusCode(response.StatusCode, new { response.Message, response.Result });
     }
     
@@ -34,7 +41,7 @@ public class ProcedureController(IProcedureService procedureService) : Controlle
     {
         if (procedure == null) return BadRequest("Dados inválidos.");
 
-        ResponseApi<Procedure?> response = await procedureService.CreateAsync(procedure);
+        ResponseApi<Procedure?> response = await service.CreateAsync(procedure);
 
         return StatusCode(response.StatusCode, new { response.Message });
     }
@@ -45,7 +52,7 @@ public class ProcedureController(IProcedureService procedureService) : Controlle
     {
         if (procedure == null) return BadRequest("Dados inválidos.");
 
-        ResponseApi<Procedure?> response = await procedureService.UpdateAsync(procedure);
+        ResponseApi<Procedure?> response = await service.UpdateAsync(procedure);
 
         return StatusCode(response.StatusCode, new { response.Message });
     }
@@ -54,7 +61,7 @@ public class ProcedureController(IProcedureService procedureService) : Controlle
     [HttpDelete("{id}")]
     public async Task<IActionResult> Delete(string id)
     {
-        ResponseApi<Procedure> response = await procedureService.DeleteAsync(id);
+        ResponseApi<Procedure> response = await service.DeleteAsync(id);
 
         return StatusCode(response.StatusCode, new { response.Message });
     }

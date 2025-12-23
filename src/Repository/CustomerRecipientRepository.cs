@@ -199,7 +199,33 @@ namespace api_slim.src.Repository
             return new(null, 500, "Falha ao buscar Beneficiário");
         }
     }
-    
+    public async Task<ResponseApi<List<dynamic>>> GetSelectAsync(PaginationUtil<CustomerRecipient> pagination)
+    {
+        try
+        {
+            List<BsonDocument> pipeline = new()
+            {
+                new("$match", pagination.PipelineFilter),
+                new("$sort", pagination.PipelineSort),
+                new("$project", new BsonDocument
+                {
+                    {"_id", 0}, 
+                    {"id", new BsonDocument("$toString", "$_id")},
+                    {"name", 1},
+                    {"createdAt", 1}
+                }),
+                new("$sort", pagination.PipelineSort),
+            };
+
+            List<BsonDocument> results = await context.CustomerRecipients.Aggregate<BsonDocument>(pipeline).ToListAsync();
+            List<dynamic> list = results.Select(doc => BsonSerializer.Deserialize<dynamic>(doc)).ToList();
+            return new(list);
+        }
+        catch
+        {
+            return new(null, 500, "Falha ao buscar Items");
+        }
+    }
     public async Task<int> GetCountDocumentsAsync(PaginationUtil<CustomerRecipient> pagination)
     {
         List<BsonDocument> pipeline = new()

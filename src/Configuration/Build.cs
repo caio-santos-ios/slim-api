@@ -102,7 +102,11 @@ namespace api_slim.src.Configuration
             builder.Services.AddTransient<ICustomerContractService, CustomerContractService>();
             builder.Services.AddTransient<ICustomerContractRepository, CustomerContractRepository>();                  
             builder.Services.AddTransient<ISupplierService, SupplierService>();
-            builder.Services.AddTransient<ISupplierRepository, SupplierRepository>();                  
+            builder.Services.AddTransient<ISupplierRepository, SupplierRepository>();
+
+            builder.Services.AddTransient<IInPersonService, InPersonService>();
+            builder.Services.AddTransient<IInPersonRepository, InPersonRepository>();
+            builder.Services.AddTransient<ITelemedicineService, TelemedicineService>();
 
             // Handlers
             builder.Services.AddTransient<SmsHandler>();

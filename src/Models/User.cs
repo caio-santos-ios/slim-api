@@ -56,7 +56,6 @@ namespace api_slim.src.Models
         
         [BsonElement("description")]
         public string Description {get;set;} = string.Empty;
-
         
         [BsonElement("routines")]
         public List<Routine> Routines {get;set;} = [];

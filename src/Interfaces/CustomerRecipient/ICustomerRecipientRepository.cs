@@ -9,6 +9,7 @@ public interface ICustomerRecipientRepository
     Task<ResponseApi<List<dynamic>>> GetAllAsync(PaginationUtil<CustomerRecipient> pagination);
     Task<ResponseApi<dynamic?>> GetByIdAggregateAsync(string id);
     Task<ResponseApi<CustomerRecipient?>> GetByIdAsync(string id);
+    Task<ResponseApi<List<dynamic>>> GetSelectAsync(PaginationUtil<CustomerRecipient> pagination);
     Task<int> GetCountDocumentsAsync(PaginationUtil<CustomerRecipient> pagination);
     Task<ResponseApi<CustomerRecipient?>> CreateAsync(CustomerRecipient address);
     Task<ResponseApi<CustomerRecipient?>> UpdateAsync(CustomerRecipient address);

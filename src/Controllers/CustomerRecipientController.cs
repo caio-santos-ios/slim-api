@@ -9,13 +9,13 @@ namespace api_slim.src.Controllers
 {
 [Route("api/customer-recipients")]
 [ApiController]
-public class CustomerRecipientController(ICustomerRecipientService customerRecipientService) : ControllerBase
+public class CustomerRecipientController(ICustomerRecipientService service) : ControllerBase
 {
     [Authorize]
     [HttpGet]
     public async Task<IActionResult> GetAll()
     {
-        PaginationApi<List<dynamic>> response = await customerRecipientService.GetAllAsync(new(Request.Query));
+        PaginationApi<List<dynamic>> response = await service.GetAllAsync(new(Request.Query));
         return StatusCode(response.StatusCode, new { response.Message, response.Result });
     }
     
@@ -23,7 +23,15 @@ public class CustomerRecipientController(ICustomerRecipientService customerRecip
     [HttpGet("{id}")]
     public async Task<IActionResult> GetByIdAsync(string id)
     {
-        ResponseApi<dynamic?> response = await customerRecipientService.GetByIdAggregateAsync(id);
+        ResponseApi<dynamic?> response = await service.GetByIdAggregateAsync(id);
+        return StatusCode(response.StatusCode, new { response.Message, response.Result });
+    }
+
+    [Authorize]
+    [HttpGet("select")]
+    public async Task<IActionResult> GetSelectAsync()
+    {
+        ResponseApi<List<dynamic>> response = await service.GetSelectAsync(new(Request.Query));
         return StatusCode(response.StatusCode, new { response.Message, response.Result });
     }
     
@@ -33,7 +41,7 @@ public class CustomerRecipientController(ICustomerRecipientService customerRecip
     {
         if (customer == null) return BadRequest("Dados inválidos.");
 
-        ResponseApi<CustomerRecipient?> response = await customerRecipientService.CreateAsync(customer);
+        ResponseApi<CustomerRecipient?> response = await service.CreateAsync(customer);
 
         return StatusCode(response.StatusCode, new { response.Message });
     }
@@ -44,7 +52,7 @@ public class CustomerRecipientController(ICustomerRecipientService customerRecip
     {
         if (customer == null) return BadRequest("Dados inválidos.");
 
-        ResponseApi<CustomerRecipient?> response = await customerRecipientService.UpdateAsync(customer);
+        ResponseApi<CustomerRecipient?> response = await service.UpdateAsync(customer);
 
         return StatusCode(response.StatusCode, new { response.Message });
     }
@@ -53,7 +61,7 @@ public class CustomerRecipientController(ICustomerRecipientService customerRecip
     [HttpDelete("{id}")]
     public async Task<IActionResult> Delete(string id)
     {
-        ResponseApi<CustomerRecipient> response = await customerRecipientService.DeleteAsync(id);
+        ResponseApi<CustomerRecipient> response = await service.DeleteAsync(id);
 
         return StatusCode(response.StatusCode, new { response.Message });
     }

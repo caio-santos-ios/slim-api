@@ -114,6 +114,34 @@ namespace api_slim.src.Repository
         }
     }
     
+    public async Task<ResponseApi<List<dynamic>>> GetSelectAsync(PaginationUtil<Procedure> pagination)
+    {
+        try
+        {
+            List<BsonDocument> pipeline = new()
+            {
+                new("$match", pagination.PipelineFilter),
+                new("$sort", pagination.PipelineSort),
+                new("$addFields", new BsonDocument
+                {
+                    {"id", new BsonDocument("$toString", "$_id")},
+                }),
+                new("$project", new BsonDocument
+                {
+                    {"_id", 0}, 
+                }),
+                new("$sort", pagination.PipelineSort),
+            };
+
+            List<BsonDocument> results = await context.Procedures.Aggregate<BsonDocument>(pipeline).ToListAsync();
+            List<dynamic> list = results.Select(doc => BsonSerializer.Deserialize<dynamic>(doc)).ToList();
+            return new(list);
+        }
+        catch
+        {
+            return new(null, 500, "Falha ao buscar Items");
+        }
+    }
     public async Task<int> GetCountDocumentsAsync(PaginationUtil<Procedure> pagination)
     {
         List<BsonDocument> pipeline = new()
