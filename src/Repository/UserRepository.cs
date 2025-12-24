@@ -43,6 +43,9 @@ namespace api_slim.src.Repository
                         {"id", new BsonDocument("$toString", "$_id")},
                         {"name", 1},
                         {"email", 1},
+                        {"admin", 1},
+                        {"blocked", 1},
+                        {"photo", 1}
                     }),
                     new("$sort", pagination.PipelineSort),
                 };
@@ -101,6 +104,9 @@ namespace api_slim.src.Repository
                         {"name", 1},
                         {"email", 1},
                         {"modules", 1},
+                        {"admin", 1},
+                        {"blocked", 1},
+                        {"photo", 1}
                     }),
                 ];
 
@@ -117,7 +123,7 @@ namespace api_slim.src.Repository
         {
             try
             {
-                User? user = await context.Users.Find(x => x.Id == id && !x.Deleted && x.Active && x.ValidatedAccess && !x.Blocked).FirstOrDefaultAsync();
+                User? user = await context.Users.Find(x => x.Id == id && !x.Deleted).FirstOrDefaultAsync();
                 return new(user);
             }
             catch
@@ -239,7 +245,7 @@ namespace api_slim.src.Repository
             try
             {
                 await context.Users.ReplaceOneAsync(x => x.Id == user.Id, user);
-
+                user.Password = "";
                 return new(user, 201, "Usuário atualizado com sucesso");
             }
             catch

@@ -33,6 +33,9 @@ namespace api_slim.src.Models
         [BsonElement("blocked")]
         public bool Blocked {get;set;} = false;
         
+        [BsonElement("admin")]
+        public bool Admin {get;set;} = false;
+        
         [BsonElement("codeAccess")]
         public string CodeAccess {get;set;} = string.Empty;
 

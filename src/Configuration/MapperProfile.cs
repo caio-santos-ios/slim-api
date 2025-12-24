@@ -35,6 +35,8 @@ namespace api_slim.src.Configuration
             
             CreateMap<CreateBillingDTO, Billing>().ReverseMap();
             CreateMap<UpdateBillingDTO, Billing>().ReverseMap();
+            CreateMap<CreateBillingItemDTO, BillingItem>().ReverseMap();
+            CreateMap<UpdateBillingItemDTO, BillingItem>().ReverseMap();
 
             CreateMap<CreateSellerDTO, Seller>().ReverseMap();
             CreateMap<UpdateSellerDTO, Seller>().ReverseMap();

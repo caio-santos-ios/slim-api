@@ -19,7 +19,7 @@ namespace api_slim.src.Controllers
             if (user == null) return BadRequest("Dados inválidos");
 
             ResponseApi<AuthResponse> response = await authService.LoginAsync(user);
-            return response.IsSuccess ? Ok(new {response.Data}) : BadRequest(new{response.Data, response.Message});
+            return StatusCode(response.StatusCode, new { response.Message, response.Data });
         }
         
         [HttpPost]

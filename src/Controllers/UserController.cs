@@ -47,7 +47,7 @@ namespace api_slim.src.Controllers
 
             ResponseApi<User?> response = await userService.UpdateAsync(user);
 
-             return StatusCode(response.StatusCode, new { response.Message, response.Result });
+            return StatusCode(response.StatusCode, new { response.Message, response.Result });
         }
         
         [Authorize]
@@ -58,7 +58,7 @@ namespace api_slim.src.Controllers
 
             ResponseApi<User?> response = await userService.UpdateModuleAsync(user);
 
-             return StatusCode(response.StatusCode, new { response.Message, response.Result });
+            return StatusCode(response.StatusCode, new { response.Message, response.Result });
         }
         
         [HttpPut("code-access")]
@@ -84,7 +84,7 @@ namespace api_slim.src.Controllers
         public async Task<IActionResult> SavePhotoProfileAsync([FromForm] SaveUserPhotoDTO user)
         {
             ResponseApi<User?> response = await userService.SavePhotoProfileAsync(user);
-            return response.IsSuccess ? Ok(new{response.Message}) : BadRequest(new{response.Message});
+            return StatusCode(response.StatusCode, new { response.Message, response.Result });
         }
         
         [HttpDelete("remove-profile-photo/{id}")]
@@ -94,15 +94,16 @@ namespace api_slim.src.Controllers
             return response.IsSuccess ? Ok(new{response.Message}) : BadRequest(new{response.Message});
         }
         
+        [Authorize]
         [HttpGet("logged")]
         public async Task<IActionResult> GetLoggedAsync()
         {
             var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
-            var email = User.FindFirst(ClaimTypes.Email)?.Value;
-            var role = User.FindFirst(ClaimTypes.Role)?.Value;
+            // var email = User.FindFirst(ClaimTypes.Email)?.Value;
+            // var role = User.FindFirst(ClaimTypes.Role)?.Value;
 
-            ResponseApi<dynamic?> user = await userService.GetByIdAggregateAsync(userId!);
-            return user.IsSuccess ? Ok(user) : BadRequest(new{ user.Message });
+            ResponseApi<dynamic?> response = await userService.GetByIdAggregateAsync(userId!);
+            return StatusCode(response.StatusCode, new { response.Message, response.Result });
         }
     }
 }

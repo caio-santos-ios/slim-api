@@ -16,16 +16,7 @@ namespace api_slim.src.Models
         [BsonElement("description")]
         public string Description { get; set; } = string.Empty;
 
-        [BsonElement("start")]
-        public string Start { get; set; } = string.Empty; 
-
-        [BsonElement("end")]
-        public string End { get; set; } = string.Empty; 
-        
-        [BsonElement("deliveryDate")]
-        public string DeliveryDate { get; set; } = string.Empty;
-
-        [BsonElement("billingDate")]
-        public string BillingDate { get; set; } = string.Empty;
+        [BsonElement("items")]
+        public List<BillingItem> Items {get;set;} = [];
     }
 }

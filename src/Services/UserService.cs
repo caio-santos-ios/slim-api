@@ -20,10 +20,36 @@ namespace api_slim.src.Services
 
                 if(Validator.IsReliable(request.Password).Equals("Ruim")) return new(null, 400, $"Senha é muito fraca");
 
-                ResponseApi<User?> isPhone = await userRepository.GetByPhoneAsync(request.Phone);
-                if(isPhone.Data is not null) return new(null, 400, "Celular inválido.");
-
                 dynamic access = Util.GenerateCodeAccess();
+
+                List<api_slim.src.Models.Module> modules = [];
+                foreach (var module in request.Modules)
+                {
+                    List<api_slim.src.Models.Routine> routines = [];
+
+                    foreach (var routine in module.Routines)
+                    {
+                        routines.Add(new () 
+                        {
+                            Code = routine.Code,
+                            Description = routine.Description,
+                            Permissions = new ()
+                            {
+                                Create = routine.Permissions.Create,
+                                Read = routine.Permissions.Read,
+                                Update = routine.Permissions.Update,
+                                Delete = routine.Permissions.Delete
+                            }
+                        });
+                    }
+                    
+                    modules.Add(new () 
+                    {
+                        Code = module.Code,
+                        Description = module.Description,
+                        Routines = routines
+                    });
+                };
 
                 User user = new()
                 {
@@ -32,19 +58,22 @@ namespace api_slim.src.Services
                     Phone = request.Phone,
                     Name = request.Name,
                     Password = BCrypt.Net.BCrypt.HashPassword(request.Password),
-                    CodeAccess = access.CodeAccess,
-                    CodeAccessExpiration = access.CodeAccessExpiration,
-                    ValidatedAccess = false
+                    CodeAccess = "",
+                    CodeAccessExpiration = null,
+                    ValidatedAccess = true,
+                    Modules = modules,
+                    Admin = request.Admin,
+                    Blocked = request.Blocked
                 };
 
                 ResponseApi<User?> response = await userRepository.CreateAsync(user);
                 if(response.Data is null) return new(null, 400, "Falha ao criar conta.");
                 
-                string messageCode = $"Seu código de verificação é: {access.CodeAccess}";
+                // string messageCode = $"Seu código de verificação é: {access.CodeAccess}";
                 
-                await smsHandler.SendMessageAsync(request.Phone, messageCode);
+                // await smsHandler.SendMessageAsync(request.Phone, messageCode);
                 
-                await mailHandler.SendMailAsync(request.Email, "Código de verificação", messageCode);
+                // await mailHandler.SendMailAsync(request.Email, "Código de verificação", messageCode);
 
                 return new(response.Data, 201, "Conta criada com sucesso, foi enviado o código de verificação para seu celular e e-mail.");
             }
@@ -60,16 +89,6 @@ namespace api_slim.src.Services
         {
             try
             {
-                // bool hasAcess = await userRepository.GetAccessValitedAsync(userId);
-                // if(!hasAcess) {
-                //     ResponseApi<User?> user = await userRepository.GetByIdAsync(userId);
-                //     if(user.Data is null) return new(null, 404, "Falha ao listar usuários");
-                //     ResponseApi<User?> response = await ResendCodeAccessAsync(new() { Id = user.Data.Id, Email = user.Data.Email, Phone = user.Data.Phone });
-                //     if(!response.IsSuccess) return new(null, 404, "Falha ao listar usuários");
-                    
-                //     return new(null, 403, "Valide o código envido no seu celular ou e-mail");
-                // };
-
                 PaginationUtil<User> pagination = new(request.QueryParams);
                 ResponseApi<List<dynamic>> users = await userRepository.GetAllAsync(pagination);
                 int count = await userRepository.GetCountDocumentsAsync(pagination);
@@ -177,7 +196,6 @@ namespace api_slim.src.Services
             {
                 ResponseApi<User?> user = await userRepository.GetByIdAsync(request.Id);
                 if(user.Data is null) return new(null, 404, "Falha ao atualizar");
-                // if(!Validator.IsEmail(request.Email)) return new(null, 404, "E-mail inválido.");
                 
                 user.Data.UpdatedAt = DateTime.UtcNow;
                 List<api_slim.src.Models.Module> modules = [];
@@ -210,6 +228,10 @@ namespace api_slim.src.Services
                 };
 
                 user.Data.Modules = modules;
+                user.Data.Name = request.Name;
+                user.Data.Email = request.Email;
+                user.Data.Blocked = request.Blocked;
+                user.Data.Admin = request.Admin;
 
                 ResponseApi<User?> response = await userRepository.UpdateAsync(user.Data);
                 if(!response.IsSuccess) return new(null, 400, "Falha ao atualizar");
@@ -279,10 +301,9 @@ namespace api_slim.src.Services
                     request.Photo.CopyTo(stream);
                 }
 
-                // string uriPhoto = await cloudinaryHandler.Upload(tempPath, "api-barber", "users");
-                // if(string.IsNullOrEmpty(uriPhoto)) return new(null, 400, "Falha ao salvar foto de perfil");
-                // user.Data.UpdatedAt = DateTime.UtcNow;
-                // user.Data.Photo = uriPhoto;
+                string uriPhoto = await cloudinaryHandler.UploadAttachment("user", request.Photo);
+                user.Data.UpdatedAt = DateTime.UtcNow;
+                user.Data.Photo = uriPhoto;
 
                 ResponseApi<User?> response = await userRepository.UpdateAsync(user.Data);
                 if(!response.IsSuccess) return new(null, 400, "Falha ao salvar foto de perfil");
