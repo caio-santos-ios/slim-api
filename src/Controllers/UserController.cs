@@ -29,6 +29,7 @@ namespace api_slim.src.Controllers
             return StatusCode(response.StatusCode, new { response.Message, response.Result });
         }
         
+        [Authorize]
         [HttpPost]
         public async Task<IActionResult> Create([FromBody] CreateUserDTO user)
         {
@@ -80,6 +81,7 @@ namespace api_slim.src.Controllers
             return response.IsSuccess ? Ok(new{response.Message}) : BadRequest(new{response.Message});
         }
 
+        [Authorize]
         [HttpPut("profile-photo")]
         public async Task<IActionResult> SavePhotoProfileAsync([FromForm] SaveUserPhotoDTO user)
         {
@@ -87,6 +89,7 @@ namespace api_slim.src.Controllers
             return StatusCode(response.StatusCode, new { response.Message, response.Result });
         }
         
+        [Authorize]
         [HttpDelete("remove-profile-photo/{id}")]
         public async Task<IActionResult> RemovePhotoProfileAsync(string id)
         {
@@ -104,6 +107,15 @@ namespace api_slim.src.Controllers
 
             ResponseApi<dynamic?> response = await userService.GetByIdAggregateAsync(userId!);
             return StatusCode(response.StatusCode, new { response.Message, response.Result });
+        }
+
+        [Authorize]
+        [HttpDelete("{id}")]
+        public async Task<IActionResult> Delete(string id)
+        {
+            ResponseApi<User> response = await userService.DeleteAsync(id);
+
+            return StatusCode(response.StatusCode, new { response.Message });
         }
     }
 }

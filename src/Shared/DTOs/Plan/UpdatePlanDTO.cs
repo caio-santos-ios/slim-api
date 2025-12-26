@@ -11,7 +11,7 @@ namespace api_slim.src.Shared.DTOs
         public decimal Cost { get; set; }
         public string Type { get; set; } = string.Empty;
         public string Description { get; set; } = string.Empty;
-        public string ServiceModuleIds { get; set; } = string.Empty;
+        public string ListServiceModuleIds { get; set; } = string.Empty;
         public bool Active {get;set;}
                     
         [SwaggerIgnore]

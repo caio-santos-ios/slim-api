@@ -27,5 +27,7 @@ namespace api_slim.src.Models
 
         [BsonElement("image")]
         public string Image { get; set; } = string.Empty;
+        [BsonElement("serviceModuleIds")]
+        public List<string> ServiceModuleIds { get; set; } = [];
     }
 }

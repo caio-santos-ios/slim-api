@@ -47,6 +47,12 @@ namespace api_slim.src.Services
         try
         {
             Plan plan = _mapper.Map<Plan>(request);
+
+            if(!string.IsNullOrEmpty(request.ListServiceModuleIds))
+            {
+                plan.ServiceModuleIds = request.ListServiceModuleIds.Split(",").Select(x => x).ToList();
+            }
+
             ResponseApi<Plan?> response = await planRepository.CreateAsync(plan);
 
             if(request.Image is not null && response.Data is not null)
@@ -55,21 +61,21 @@ namespace api_slim.src.Services
                 await planRepository.UpdateAsync(response.Data);
             }
 
-            if(!string.IsNullOrEmpty(request.ServiceModuleIds))
-            {
-                List<string> listId = request.ServiceModuleIds.Split(",").Select(x => x).ToList();
-                foreach (string serviceModuleId in listId)
-                {
-                    ResponseApi<ServiceModule?> serviceModule = await serviceModuleRepository.GetByIdAsync(serviceModuleId);
-                    if(serviceModule.Data is not null)
-                    {
-                        serviceModule.Data.PlanId = plan.Id;
-                        serviceModule.Data.UpdatedAt = DateTime.UtcNow;
+            // if(!string.IsNullOrEmpty(request.ServiceModuleIds))
+            // {
+            //     List<string> listId = request.ServiceModuleIds.Split(",").Select(x => x).ToList();
+            //     foreach (string serviceModuleId in listId)
+            //     {
+            //         ResponseApi<ServiceModule?> serviceModule = await serviceModuleRepository.GetByIdAsync(serviceModuleId);
+            //         if(serviceModule.Data is not null)
+            //         {
+            //             serviceModule.Data.PlanId = plan.Id;
+            //             serviceModule.Data.UpdatedAt = DateTime.UtcNow;
                         
-                        await serviceModuleRepository.UpdateAsync(serviceModule.Data);
-                    }
-                };
-            };
+            //             await serviceModuleRepository.UpdateAsync(serviceModule.Data);
+            //         }
+            //     };
+            // };
 
             if(response.Data is null) return new(null, 400, "Falha ao criar plano.");
             return new(response.Data, 201, "Plano criado com sucesso.");
@@ -93,6 +99,10 @@ namespace api_slim.src.Services
             plan.UpdatedAt = DateTime.UtcNow;
             plan.CreatedAt = planResponse.Data.CreatedAt;
             plan.Image = planResponse.Data.Image;
+            if(!string.IsNullOrEmpty(request.ListServiceModuleIds))
+            {
+                plan.ServiceModuleIds = request.ListServiceModuleIds.Split(",").Select(x => x).ToList();
+            }
 
             ResponseApi<Plan?> response = await planRepository.UpdateAsync(plan);
             if(!response.IsSuccess) return new(null, 400, "Falha ao atualizar");
@@ -103,35 +113,36 @@ namespace api_slim.src.Services
                 await planRepository.UpdateAsync(response.Data);
             }
 
-            ResponseApi<List<ServiceModule>> lastServiceModule = await serviceModuleRepository.GetByPlanIdAsync(plan.Id);
-            foreach (ServiceModule serviceModule in lastServiceModule.Data!)
-            {
-                serviceModule.PlanId = "";
-                serviceModule.UpdatedAt = DateTime.UtcNow;
+            // ResponseApi<List<ServiceModule>> lastServiceModule = await serviceModuleRepository.GetByPlanIdAsync(plan.Id);
+            // foreach (ServiceModule serviceModule in lastServiceModule.Data!)
+            // {
+            //     serviceModule.PlanId = "";
+            //     serviceModule.UpdatedAt = DateTime.UtcNow;
 
-                await serviceModuleRepository.UpdateAsync(serviceModule);
-            };
+            //     await serviceModuleRepository.UpdateAsync(serviceModule);
+            // };
 
-            if(!string.IsNullOrEmpty(request.ServiceModuleIds))
-            {
-                List<string> listId = request.ServiceModuleIds.Split(",").Select(x => x).ToList();
-                foreach (string serviceModuleId in listId)
-                {
-                    ResponseApi<ServiceModule?> serviceModule = await serviceModuleRepository.GetByIdAsync(serviceModuleId);
-                    if(serviceModule.Data is not null)
-                    {
-                        serviceModule.Data.PlanId = plan.Id;
-                        serviceModule.Data.UpdatedAt = DateTime.UtcNow;
+            // if(!string.IsNullOrEmpty(request.ServiceModuleIds))
+            // {
+            //     List<string> listId = request.ServiceModuleIds.Split(",").Select(x => x).ToList();
+            //     foreach (string serviceModuleId in listId)
+            //     {
+            //         ResponseApi<ServiceModule?> serviceModule = await serviceModuleRepository.GetByIdAsync(serviceModuleId);
+            //         if(serviceModule.Data is not null)
+            //         {
+            //             serviceModule.Data.PlanId = plan.Id;
+            //             serviceModule.Data.UpdatedAt = DateTime.UtcNow;
                         
-                        await serviceModuleRepository.UpdateAsync(serviceModule.Data);
-                    }
-                };
-            };
+            //             await serviceModuleRepository.UpdateAsync(serviceModule.Data);
+            //         }
+            //     };
+            // };
 
             return new(response.Data, 200, "Atualizado com sucesso");
         }
-        catch
+        catch(Exception ex)
         {
+            System.Console.WriteLine(ex.Message);
             return new(null, 500, "Ocorreu um erro inesperado. Por favor, tente novamente mais tarde.");
         }
     }

@@ -85,6 +85,38 @@ namespace api_slim.src.Repository
                         { "as", "_address" }
                     }),
                     
+                    new BsonDocument("$lookup", new BsonDocument
+                    {
+                        { "from", "addresses" },
+
+                        { "let", new BsonDocument("id", new BsonDocument("$toString", "$_id")) },
+
+                        { "pipeline", new BsonArray
+                            {
+                                new BsonDocument("$match", new BsonDocument
+                                {
+                                    { "$expr", new BsonDocument("$and", new BsonArray
+                                        {
+                                            new BsonDocument("$eq", new BsonArray
+                                            {
+                                                "$parentId",
+                                                "$$id"
+                                            }),
+
+                                            new BsonDocument("$eq", new BsonArray
+                                            {
+                                                "$parent",
+                                                "accredited-network-responsible"
+                                            })
+                                        })
+                                    }
+                                })
+                            }
+                        },
+
+                        { "as", "_address_responsible" }
+                    }),
+                    
                     new("$addFields", new BsonDocument {
                         {"id", new BsonDocument("$toString", "$_id")},
                         {"address", new BsonDocument
@@ -99,6 +131,20 @@ namespace api_slim.src.Repository
                                 {"zipCode", new BsonDocument("$first", "$_address.zipCode")},
                                 {"parent", new BsonDocument("$first", "$_address.parent")},
                                 {"parentId", new BsonDocument("$first", "$_address.parentId")},
+                            }
+                        },
+                        {
+                            "responsible.address", new BsonDocument {
+                                {"id", new BsonDocument("$toString", new BsonDocument("$first", "$_address_responsible._id"))},
+                                {"street", new BsonDocument("$first", "$_address_responsible.street")},
+                                {"number", new BsonDocument("$first", "$_address_responsible.number")},
+                                {"complement", new BsonDocument("$first", "$_address_responsible.complement")},
+                                {"neighborhood", new BsonDocument("$first", "$_address_responsible.neighborhood")},
+                                {"city", new BsonDocument("$first", "$_address_responsible.city")},
+                                {"state", new BsonDocument("$first", "$_address_responsible.state")},
+                                {"zipCode", new BsonDocument("$first", "$_address_responsible.zipCode")},
+                                {"parent", new BsonDocument("$first", "$_address_responsible.parent")},
+                                {"parentId", new BsonDocument("$first", "$_address_responsible.parentId")},
                             }
                         }
                     }),

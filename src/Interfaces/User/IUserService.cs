@@ -1,3 +1,4 @@
+using api_slim.src.Models;
 using api_slim.src.Models.Base;
 using api_slim.src.Shared.DTOs;
 
@@ -8,13 +9,13 @@ namespace api_slim.src.Interfaces
         Task<PaginationApi<List<dynamic>>> GetAllAsync(GetAllDTO request, string userId);
         Task<ResponseApi<dynamic?>> GetByIdAggregateAsync(string id);
         Task<ResponseApi<List<dynamic>>> GetSelectBarberAsync(GetAllDTO request);
-        Task<ResponseApi<api_slim.src.Models.User?>> CreateAsync(CreateUserDTO user);
-        Task<ResponseApi<api_slim.src.Models.User?>> UpdateAsync(UpdateUserDTO user);
-        Task<ResponseApi<api_slim.src.Models.User?>> UpdateModuleAsync(UpdateUserDTO user);
-        Task<ResponseApi<api_slim.src.Models.User?>> SavePhotoProfileAsync(SaveUserPhotoDTO user);
-        Task<ResponseApi<api_slim.src.Models.User?>> ResendCodeAccessAsync(UpdateUserDTO user);
-        Task<ResponseApi<api_slim.src.Models.User?>> RemovePhotoProfileAsync(string id);
-        Task<ResponseApi<api_slim.src.Models.User?>> ValidatedAccessAsync(string codeAccess);
-        Task<ResponseApi<api_slim.src.Models.User>> DeleteAsync(string id);
+        Task<ResponseApi<User?>> CreateAsync(CreateUserDTO user);
+        Task<ResponseApi<User?>> UpdateAsync(UpdateUserDTO user);
+        Task<ResponseApi<User?>> UpdateModuleAsync(UpdateUserDTO user);
+        Task<ResponseApi<User?>> SavePhotoProfileAsync(SaveUserPhotoDTO user);
+        Task<ResponseApi<User?>> ResendCodeAccessAsync(UpdateUserDTO user);
+        Task<ResponseApi<User?>> RemovePhotoProfileAsync(string id);
+        Task<ResponseApi<User?>> ValidatedAccessAsync(string codeAccess);
+        Task<ResponseApi<User>> DeleteAsync(string id);
     }
 }

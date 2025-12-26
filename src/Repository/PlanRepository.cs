@@ -26,16 +26,26 @@ namespace api_slim.src.Repository
                 new BsonDocument("$lookup", new BsonDocument
                 {
                     { "from", "service_modules" },
-                    { "let", new BsonDocument("planIdStr", new BsonDocument("$toString", "$_id")) },
+                    { "let", new BsonDocument("idsDoContrato", "$serviceModuleIds") }, 
                     { "pipeline", new BsonArray
                         {
                             new BsonDocument("$match", new BsonDocument
                             {
-                                { "$expr", new BsonDocument("$eq", new BsonArray { "$planId", "$$planIdStr" }) }
+                                { "$expr", new BsonDocument("$and", new BsonArray 
+                                    {
+                                        new BsonDocument("$gt", new BsonArray { new BsonDocument("$size", new BsonDocument("$ifNull", new BsonArray { "$$idsDoContrato", new BsonArray() })), 0 }),
+                                        
+                                        new BsonDocument("$in", new BsonArray 
+                                        { 
+                                            new BsonDocument("$toString", "$_id"), 
+                                            "$$idsDoContrato" 
+                                        })
+                                    })
+                                }
                             })
                         }
                     },
-                    { "as", "_service_modules" } 
+                    { "as", "_service_modules" }
                 }),
 
                 new BsonDocument("$addFields", new BsonDocument

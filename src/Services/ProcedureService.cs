@@ -61,7 +61,7 @@ namespace api_slim.src.Services
             Procedure procedure = _mapper.Map<Procedure>(request);
             
             ResponseApi<long> code = await procedureRepository.GetNextCodeAsync();
-            procedure.Code = code.Data.ToString().PadLeft(6, '0');
+            procedure.Code = (code.Data + 1).ToString().PadLeft(6, '0');
             ResponseApi<Procedure?> response = await procedureRepository.CreateAsync(procedure);
 
             if(response.Data is null) return new(null, 400, "Falha ao criar Procedimento.");

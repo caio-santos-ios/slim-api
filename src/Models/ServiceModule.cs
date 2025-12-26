@@ -30,5 +30,8 @@ namespace api_slim.src.Models
 
         [BsonElement("image")]
         public string Image { get; set; } = string.Empty;
+       
+        [BsonElement("type")]
+        public string Type { get; set; } = string.Empty;
     }
 }

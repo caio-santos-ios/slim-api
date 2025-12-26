@@ -3,6 +3,7 @@ using api_slim.src.Interfaces;
 using api_slim.src.Models;
 using api_slim.src.Models.Base;
 using api_slim.src.Shared.DTOs;
+using api_slim.src.Shared.Templates;
 using api_slim.src.Shared.Utils;
 using api_slim.src.Shared.Validators;
 
@@ -57,7 +58,7 @@ namespace api_slim.src.Services
                     Email = request.Email,
                     Phone = request.Phone,
                     Name = request.Name,
-                    Password = BCrypt.Net.BCrypt.HashPassword(request.Password),
+                    Password = BCrypt.Net.BCrypt.HashPassword(access.CodeAccess),
                     CodeAccess = "",
                     CodeAccessExpiration = null,
                     ValidatedAccess = true,
@@ -69,13 +70,13 @@ namespace api_slim.src.Services
                 ResponseApi<User?> response = await userRepository.CreateAsync(user);
                 if(response.Data is null) return new(null, 400, "Falha ao criar conta.");
                 
-                // string messageCode = $"Seu código de verificação é: {access.CodeAccess}";
+                string messageCode = $"Seu código de verificação é: {access.CodeAccess}";
                 
-                // await smsHandler.SendMessageAsync(request.Phone, messageCode);
+                await smsHandler.SendMessageAsync(request.Phone, messageCode);
                 
-                // await mailHandler.SendMailAsync(request.Email, "Código de verificação", messageCode);
+                await mailHandler.SendMailAsync(request.Email, "Primeiro acesso", MailTemplate.FirstAccess(request.Email, access.CodeAccess));
 
-                return new(response.Data, 201, "Conta criada com sucesso, foi enviado o código de verificação para seu celular e e-mail.");
+                return new(null, 201, "Conta criada com sucesso, foi enviado o código de verificação para seu celular e e-mail.");
             }
             catch
             {                
