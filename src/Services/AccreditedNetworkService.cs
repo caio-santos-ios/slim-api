@@ -44,7 +44,7 @@ namespace api_slim.src.Services
         try
         {
             PaginationUtil<AccreditedNetwork> pagination = new(request.QueryParams);
-            ResponseApi<List<dynamic>> accrediteds = await accreditedNetwork.GetAllAsync(pagination);
+            ResponseApi<List<dynamic>> accrediteds = await accreditedNetwork.GetSelectAsync(pagination);
             return new(accrediteds.Data);
         }
         catch

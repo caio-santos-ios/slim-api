@@ -16,9 +16,6 @@ namespace api_slim.src.Shared.Utils
 
                 letFields.Add($"field{i}", localField[i]);
 
-                // AJUSTE AQUI: 
-                // Se o campo estrangeiro for o _id (ObjectId), convertemos para string
-                // para comparar com o valor do let (que veio como string do seu localField)
                 if (foreignField[i] == "$_id")
                 {
                     match.Add(new BsonDocument($"${_operator}", new BsonArray 

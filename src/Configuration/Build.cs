@@ -64,11 +64,13 @@ namespace api_slim.src.Configuration
             builder.Services.AddTransient<IUserService, UserService>();
             builder.Services.AddTransient<IUserRepository, UserRepository>();    
             
+            // FINANCIAL
             builder.Services.AddTransient<IAccountsReceivableService, AccountsReceivableService>();
             builder.Services.AddTransient<IAccountsReceivableRepository, AccountsReceivableRepository>();    
             builder.Services.AddTransient<IAccountsPayableService, AccountsPayableService>();
             builder.Services.AddTransient<IAccountsPayableRepository, AccountsPayableRepository>();    
             
+            // MASTER DATA
             builder.Services.AddTransient<IGenericTableService, GenericTableService>();
             builder.Services.AddTransient<IGenericTableRepository, GenericTableRepository>();                       
             builder.Services.AddTransient<IAccreditedNetworkService, AccreditedNetworkService>();
@@ -103,10 +105,17 @@ namespace api_slim.src.Configuration
             builder.Services.AddTransient<ICustomerContractRepository, CustomerContractRepository>();                  
             builder.Services.AddTransient<ISupplierService, SupplierService>();
             builder.Services.AddTransient<ISupplierRepository, SupplierRepository>();
+            builder.Services.AddTransient<ITradingTableService, TradingTableService>();
+            builder.Services.AddTransient<ITradingTableRepository, TradingTableRepository>();
 
+            // SERVICE
             builder.Services.AddTransient<IInPersonService, InPersonService>();
             builder.Services.AddTransient<IInPersonRepository, InPersonRepository>();
             builder.Services.AddTransient<ITelemedicineService, TelemedicineService>();
+
+            // DASHBOARD
+            builder.Services.AddTransient<IDashboardService, DashboardService>();
+            builder.Services.AddTransient<IDashboardRepository, DashboardRepository>();
 
             // Handlers
             builder.Services.AddTransient<SmsHandler>();

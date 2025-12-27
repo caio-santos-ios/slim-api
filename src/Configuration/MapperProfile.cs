@@ -8,7 +8,7 @@ namespace api_slim.src.Configuration
     {
         public MapperProfile()
         {
-            #region MASTER
+            #region MASTER DATA
             CreateMap<CreateGenericTableDTO, GenericTable>().ReverseMap();
             CreateMap<UpdateGenericTableDTO, GenericTable>().ReverseMap();
             
@@ -67,9 +67,12 @@ namespace api_slim.src.Configuration
            
             CreateMap<CreateSupplierDTO, Supplier>().ReverseMap();
             CreateMap<UpdateSupplierDTO, Supplier>().ReverseMap();      
+
+            CreateMap<CreateTradingTableDTO, TradingTable>().ReverseMap();
+            CreateMap<UpdateTradingTableDTO, TradingTable>().ReverseMap();      
             #endregion
 
-            #region FIN
+            #region FINANCIAL
             CreateMap<CreateAccountsReceivableDTO, AccountsReceivable>().ReverseMap();
             CreateMap<UpdateAccountsReceivableDTO, AccountsReceivable>().ReverseMap();
             CreateMap<CreateAccountsPayableDTO, AccountsPayable>().ReverseMap();

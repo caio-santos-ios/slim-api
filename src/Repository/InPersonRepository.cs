@@ -26,7 +26,6 @@ namespace api_slim.src.Repository
                     MongoUtil.Lookup("customer_recipients", ["$recipientId"], ["$_id"], "_recipient", [["deleted", false]], 1),
                     MongoUtil.Lookup("accredited_networks", ["$accreditedNetworkId"], ["$_id"], "_accredited_network", [["deleted", false]], 1),
                     MongoUtil.Lookup("service_modules", ["$serviceModuleId"], ["$_id"], "_service_module", [["deleted", false]], 1),
-                    MongoUtil.Lookup("procedures", ["$procedureId"], ["$_id"], "_procedure", [["deleted", false]], 1),
 
                     new("$project", new BsonDocument
                     {
@@ -35,7 +34,7 @@ namespace api_slim.src.Repository
                         {"createdAt", 1},
                         {"date", 1},
                         {"responsiblePayment", 1},
-                        {"recipientDescription", MongoUtil.First("_recipient.name")},
+                        {"status", 1},
                         {"accreditedNetworkDescription", MongoUtil.First("_accredited_network.corporateName")},
                         {"serviceModuleDescription", MongoUtil.First("_service_module.name")},
                         {"procedureDescription", MongoUtil.First("_procedure.name")}
@@ -65,52 +64,32 @@ namespace api_slim.src.Repository
 
                     new BsonDocument("$lookup", new BsonDocument
                     {
-                        { "from", "addresses" },
-
-                        { "let", new BsonDocument("id", new BsonDocument("$toString", "$_id")) },
-
+                        { "from", "procedures" },
+                        { "let", new BsonDocument("idsDoContrato", "$procedureIds") }, 
                         { "pipeline", new BsonArray
                             {
                                 new BsonDocument("$match", new BsonDocument
                                 {
-                                    { "$expr", new BsonDocument("$and", new BsonArray
+                                    { "$expr", new BsonDocument("$and", new BsonArray 
                                         {
-                                            new BsonDocument("$eq", new BsonArray
-                                            {
-                                                "$parentId",
-                                                "$$id"
-                                            }),
-
-                                            new BsonDocument("$eq", new BsonArray
-                                            {
-                                                "$parent",
-                                                "accredited-network"
+                                            new BsonDocument("$gt", new BsonArray { new BsonDocument("$size", new BsonDocument("$ifNull", new BsonArray { "$$idsDoContrato", new BsonArray() })), 0 }),
+                                            
+                                            new BsonDocument("$in", new BsonArray 
+                                            { 
+                                                new BsonDocument("$toString", "$_id"), 
+                                                "$$idsDoContrato" 
                                             })
                                         })
                                     }
                                 })
                             }
                         },
-
-                        { "as", "_address" }
+                        { "as", "_procedures" }
                     }),
-                    
+    
                     new("$addFields", new BsonDocument {
-                        {"id", new BsonDocument("$toString", "$_id")},
-                        {"address", new BsonDocument
-                            {
-                                {"id", new BsonDocument("$toString", new BsonDocument("$first", "$_address._id"))},
-                                {"street", new BsonDocument("$first", "$_address.street")},
-                                {"number", new BsonDocument("$first", "$_address.number")},
-                                {"complement", new BsonDocument("$first", "$_address.complement")},
-                                {"neighborhood", new BsonDocument("$first", "$_address.neighborhood")},
-                                {"city", new BsonDocument("$first", "$_address.city")},
-                                {"state", new BsonDocument("$first", "$_address.state")},
-                                {"zipCode", new BsonDocument("$first", "$_address.zipCode")},
-                                {"parent", new BsonDocument("$first", "$_address.parent")},
-                                {"parentId", new BsonDocument("$first", "$_address.parentId")},
-                            }
-                        }
+                        {"id", new BsonDocument("$toString", "$_id")},    
+                        {"procedureIds", "$_procedures"}
                     }),
 
                     new("$project", new BsonDocument

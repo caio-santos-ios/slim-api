@@ -7,9 +7,9 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace api_slim.src.Controllers
 {
-    [Route("api/service-modules")]
+    [Route("api/trading-tables")]
     [ApiController]
-    public class ServiceModuleController(IServiceModuleService service) : ControllerBase
+    public class TradingTableController(ITradingTableService service) : ControllerBase
     {
         [Authorize]
         [HttpGet]
@@ -34,39 +34,25 @@ namespace api_slim.src.Controllers
             ResponseApi<List<dynamic>> response = await service.GetSelectAsync(new(Request.Query));
             return StatusCode(response.StatusCode, new { response.Message, response.Result });
         }
-        
+                
         [Authorize]
         [HttpPost]
-        [Consumes("multipart/form-data")]
-        public async Task<IActionResult> Create([FromForm] CreateServiceModuleDTO serviceModule)
+        public async Task<IActionResult> Create([FromBody] CreateTradingTableDTO address)
         {
-            if (serviceModule == null) return BadRequest("Dados inválidos.");
+            if (address == null) return BadRequest("Dados inválidos.");
 
-            ResponseApi<ServiceModule?> response = await service.CreateAsync(serviceModule);
+            ResponseApi<TradingTable?> response = await service.CreateAsync(address);
 
-            return StatusCode(response.StatusCode, new { response.Message });
+            return StatusCode(response.StatusCode, new { response.Message, response.Result });
         }
         
         [Authorize]
         [HttpPut]
-        [Consumes("multipart/form-data")]
-        public async Task<IActionResult> Update([FromForm] UpdateServiceModuleDTO serviceModule)
+        public async Task<IActionResult> Update([FromBody] UpdateTradingTableDTO address)
         {
-            if (serviceModule == null) return BadRequest("Dados inválidos.");
+            if (address == null) return BadRequest("Dados inválidos.");
 
-            ResponseApi<ServiceModule?> response = await service.UpdateAsync(serviceModule);
-
-            return StatusCode(response.StatusCode, new { response.Message });
-        }
-
-        [Authorize]
-        [HttpPut("save-image")]
-        [Consumes("multipart/form-data")]
-        public async Task<IActionResult> UpdateImage([FromForm] UpdateServiceModuleDTO serviceModule)
-        {
-            if (serviceModule == null) return BadRequest("Dados inválidos.");
-
-            ResponseApi<ServiceModule?> response = await service.UpdateImageAsync(serviceModule);
+            ResponseApi<TradingTable?> response = await service.UpdateAsync(address);
 
             return StatusCode(response.StatusCode, new { response.Message, response.Result });
         }
@@ -75,9 +61,9 @@ namespace api_slim.src.Controllers
         [HttpDelete("{id}")]
         public async Task<IActionResult> Delete(string id)
         {
-            ResponseApi<ServiceModule> response = await service.DeleteAsync(id);
+            ResponseApi<TradingTable> response = await service.DeleteAsync(id);
 
-            return StatusCode(response.StatusCode, new { response.Message });
+            return StatusCode(response.StatusCode, new { response.Message, response.Result });
         }
     }
 }

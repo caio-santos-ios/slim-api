@@ -186,13 +186,25 @@ namespace api_slim.src.Repository
                 {
                     new("$match", pagination.PipelineFilter),
                     new("$sort", pagination.PipelineSort),
-                    new("$addFields", new BsonDocument
-                    {
+
+                    new("$addFields", new BsonDocument {
                         {"id", new BsonDocument("$toString", "$_id")},
                     }),
+
+                    MongoUtil.Lookup("accredited_networks", ["$accreditedNetworkId"], ["$id"], "_accredited_network", [["deleted", false]], 1),
+                   
+                    new("$addFields", new BsonDocument {
+                        {"tradingTableId", MongoUtil.First("_accredited_network.tradingTable")},
+                    }),
+
+                    MongoUtil.Lookup("trading_tables", ["$tradingTableId"], ["$_id"], "_trading_table", [["deleted", false]], 1),
+
                     new("$project", new BsonDocument
                     {
                         {"_id", 0}, 
+                        {"id", 1},
+                        {"corporateName", 1},
+                        {"tradingTableItems", MongoUtil.First("_trading_table.items")},
                     }),
                     new("$sort", pagination.PipelineSort),
                 };

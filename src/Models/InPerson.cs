@@ -19,8 +19,8 @@ namespace api_slim.src.Models
         [BsonElement("serviceModuleId")]
         public string ServiceModuleId {get;set;} = string.Empty; 
 
-        [BsonElement("procedureId")]
-        public string ProcedureId {get;set;} = string.Empty; 
+        [BsonElement("procedureIds")]
+        public List<string> ProcedureIds {get;set;} = [];
 
         [BsonElement("date")]
         public DateTime? Date { get; set; }
@@ -33,5 +33,8 @@ namespace api_slim.src.Models
 
         [BsonElement("status")]
         public string Status { get; set; } = string.Empty;
+        
+        [BsonElement("value")]
+        public decimal Value {get;set;}
     }
 }

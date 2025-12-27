@@ -32,7 +32,7 @@ namespace api_slim.src.Configuration
             }
         }
 
-        #region MASTER
+        #region MASTER DATA
         public IMongoCollection<User> Users
         {
             get { return Database.GetCollection<User>("users"); }
@@ -105,9 +105,13 @@ namespace api_slim.src.Configuration
         {
             get { return Database.GetCollection<Supplier>("suppliers"); }
         }
+        public IMongoCollection<TradingTable> TradingTables
+        {
+            get { return Database.GetCollection<TradingTable>("trading_tables"); }
+        }
         #endregion
 
-        #region FIN
+        #region FINANCIAL
         public IMongoCollection<AccountsReceivable> AccountsReceivables
         {
             get { return Database.GetCollection<AccountsReceivable>("accounts_receivables"); }

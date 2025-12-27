@@ -46,6 +46,7 @@ namespace api_slim.src.Services
         try
         {
             InPerson inPerson = _mapper.Map<InPerson>(request);
+            inPerson.Status = "Solicitado";
             ResponseApi<InPerson?> response = await repository.CreateAsync(inPerson);
 
             if(response.Data is null) return new(null, 400, "Falha ao criar Atendimento Presencial.");
