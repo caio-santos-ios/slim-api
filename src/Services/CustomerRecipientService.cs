@@ -60,7 +60,8 @@ namespace api_slim.src.Services
         try
         {
             CustomerRecipient customer = _mapper.Map<CustomerRecipient>(request);
-            
+            ResponseApi<long?> code = await customerRepository.GetNextCodeAsync();
+            customer.Code = code.Data.ToString()!.PadLeft(6, '0');
             ResponseApi<CustomerRecipient?> response = await customerRepository.CreateAsync(customer);
 
             if(response.Data is null) return new(null, 400, "Falha ao criar Beneficiário.");
@@ -90,6 +91,8 @@ namespace api_slim.src.Services
             
             CustomerRecipient customer = _mapper.Map<CustomerRecipient>(request);
             customer.UpdatedAt = DateTime.UtcNow;
+            customer.CreatedAt = customerResponse.Data.CreatedAt;
+            customer.Code = customerResponse.Data.Code;
 
             ResponseApi<CustomerRecipient?> response = await customerRepository.UpdateAsync(customer);
             if(!response.IsSuccess) return new(null, 400, "Falha ao atualizar");

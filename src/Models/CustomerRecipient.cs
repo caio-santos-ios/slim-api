@@ -10,6 +10,9 @@ namespace api_slim.src.Models
         [BsonRepresentation(BsonType.ObjectId)]
         public string Id { get; set; } = string.Empty;
         
+        [BsonElement("code")]
+        public string Code { get; set; } = string.Empty; 
+
         [BsonElement("contractorId")]
         public string ContractorId { get; set; } = string.Empty; 
 

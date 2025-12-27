@@ -100,7 +100,7 @@ namespace api_slim.src.Services
                 await serviceModuleRepository.UpdateAsync(response.Data);
             }
 
-            return new(response.Data, 201, "Atualizado com sucesso");
+            return new(response.Data, 200, "Atualizado com sucesso");
         }
         catch
         {

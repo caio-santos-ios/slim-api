@@ -9,13 +9,13 @@ namespace api_slim.src.Controllers
 {
     [Route("api/sellers")]
 [ApiController]
-public class SellerController(ISellerService sellerService) : ControllerBase
+public class SellerController(ISellerService service) : ControllerBase
 {
     [Authorize]
     [HttpGet]
     public async Task<IActionResult> GetAll()
     {
-        PaginationApi<List<dynamic>> response = await sellerService.GetAllAsync(new(Request.Query));
+        PaginationApi<List<dynamic>> response = await service.GetAllAsync(new(Request.Query));
         return StatusCode(response.StatusCode, new { response.Message, response.Result });
     }
     
@@ -23,17 +23,25 @@ public class SellerController(ISellerService sellerService) : ControllerBase
     [HttpGet("{id}")]
     public async Task<IActionResult> GetByIdAsync(string id)
     {
-        ResponseApi<dynamic?> response = await sellerService.GetByIdAggregateAsync(id);
+        ResponseApi<dynamic?> response = await service.GetByIdAggregateAsync(id);
         return StatusCode(response.StatusCode, new { response.Message, response.Result });
     }
     
+    [Authorize]
+    [HttpGet("select")]
+    public async Task<IActionResult> GetSelect()
+    {
+        ResponseApi<List<dynamic>> response = await service.GetSelectAsync(new(Request.Query));
+        return StatusCode(response.StatusCode, new { response.Message, response.Result });
+    }
+
     [Authorize]
     [HttpPost]
     public async Task<IActionResult> Create([FromBody] CreateSellerDTO seller)
     {
         if (seller == null) return BadRequest("Dados inválidos.");
 
-        ResponseApi<Seller?> response = await sellerService.CreateAsync(seller);
+        ResponseApi<Seller?> response = await service.CreateAsync(seller);
 
         return StatusCode(response.StatusCode, new { response.Message });
     }
@@ -44,7 +52,7 @@ public class SellerController(ISellerService sellerService) : ControllerBase
     {
         if (seller == null) return BadRequest("Dados inválidos.");
 
-        ResponseApi<Seller?> response = await sellerService.UpdateAsync(seller);
+        ResponseApi<Seller?> response = await service.UpdateAsync(seller);
 
         return StatusCode(response.StatusCode, new { response.Message });
     }
@@ -53,7 +61,7 @@ public class SellerController(ISellerService sellerService) : ControllerBase
     [HttpDelete("{id}")]
     public async Task<IActionResult> Delete(string id)
     {
-        ResponseApi<Seller> response = await sellerService.DeleteAsync(id);
+        ResponseApi<Seller> response = await service.DeleteAsync(id);
 
         return StatusCode(response.StatusCode, new { response.Message });
     }

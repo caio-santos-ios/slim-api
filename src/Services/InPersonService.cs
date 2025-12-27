@@ -46,7 +46,7 @@ namespace api_slim.src.Services
         try
         {
             InPerson inPerson = _mapper.Map<InPerson>(request);
-            inPerson.Status = "Solicitado";
+            inPerson.Status = "Solicitada";
             ResponseApi<InPerson?> response = await repository.CreateAsync(inPerson);
 
             if(response.Data is null) return new(null, 400, "Falha ao criar Atendimento Presencial.");
@@ -73,6 +73,26 @@ namespace api_slim.src.Services
             inPerson.CreatedAt = inPersonResponse.Data.CreatedAt;
 
             ResponseApi<InPerson?> response = await repository.UpdateAsync(inPerson);
+            if(!response.IsSuccess) return new(null, 400, "Falha ao atualizar");
+
+            return new(response.Data, 200, "Atualizado com sucesso");
+        }
+        catch
+        {
+            return new(null, 500, "Ocorreu um erro inesperado. Por favor, tente novamente mais tarde.");
+        }
+    }
+    public async Task<ResponseApi<InPerson?>> UpdateStatusAsync(UpdateInPersonStatusDTO request)
+    {
+        try
+        {
+            ResponseApi<InPerson?> inPersonResponse = await repository.GetByIdAsync(request.Id);
+            if(inPersonResponse.Data is null) return new(null, 404, "Falha ao atualizar");
+            
+            inPersonResponse.Data.UpdatedAt = DateTime.UtcNow;
+            inPersonResponse.Data.Status = request.Status;
+
+            ResponseApi<InPerson?> response = await repository.UpdateAsync(inPersonResponse.Data);
             if(!response.IsSuccess) return new(null, 400, "Falha ao atualizar");
 
             return new(response.Data, 200, "Atualizado com sucesso");

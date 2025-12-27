@@ -17,6 +17,7 @@ namespace api_slim.src.Shared.DTOs
         public decimal ConsumptionLimit { get; set; }        
         public string TradingTable { get; set; } = string.Empty;
         public Address Address { get; set; } = new Address();
+        public string BillingId { get; set; } = string.Empty;
         public CreateAccreditedNetworkResponsibleDTO Responsible { get; set; } = new();
     }
 }

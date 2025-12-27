@@ -50,6 +50,17 @@ namespace api_slim.src.Controllers
         }
         
         [Authorize]
+        [HttpPut("alter-status")]
+        public async Task<IActionResult> UpdateStatus([FromBody] UpdateInPersonStatusDTO accreditedNetwork)
+        {
+            if (accreditedNetwork == null) return BadRequest("Dados inválidos.");
+
+            ResponseApi<InPerson?> response = await service.UpdateStatusAsync(accreditedNetwork);
+
+            return StatusCode(response.StatusCode, new { response.Message, response.Result });
+        }
+        
+        [Authorize]
         [HttpDelete("{id}")]
         public async Task<IActionResult> Delete(string id)
         {

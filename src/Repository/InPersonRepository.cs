@@ -35,9 +35,10 @@ namespace api_slim.src.Repository
                         {"date", 1},
                         {"responsiblePayment", 1},
                         {"status", 1},
+                        {"value", 1},
                         {"accreditedNetworkDescription", MongoUtil.First("_accredited_network.corporateName")},
                         {"serviceModuleDescription", MongoUtil.First("_service_module.name")},
-                        {"procedureDescription", MongoUtil.First("_procedure.name")}
+                        {"recipientDescription", MongoUtil.First("_recipient.name")}
                     }),
                     new("$sort", pagination.PipelineSort),
                 };

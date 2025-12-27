@@ -52,12 +52,12 @@ namespace api_slim.src.Repository
                     {"_id", new ObjectId(id)},
                     {"deleted", false}
                 }),
+                new("$addFields", new BsonDocument {
+                    {"id", new BsonDocument("$toString", "$_id")},
+                }),
                 new("$project", new BsonDocument
                 {
                     {"_id", 0},
-                    {"id", new BsonDocument("$toString", "$_id")},
-                    {"name", 1},
-                    {"description", 1}
                 }),
             ];
 
@@ -83,7 +83,33 @@ namespace api_slim.src.Repository
             return new(null, 500, "Falha ao buscar Faturamento");
         }
     }
-    
+
+    public async Task<ResponseApi<List<dynamic>>> GetSelectAsync(PaginationUtil<Billing> pagination)
+    {
+        try
+        {
+            List<BsonDocument> pipeline = new()
+            {
+                new("$match", pagination.PipelineFilter),
+                new("$sort", pagination.PipelineSort),
+                new("$project", new BsonDocument
+                {
+                    {"_id", 0}, 
+                    {"id", new BsonDocument("$toString", "$_id")},
+                    {"name", 1}
+                }),
+                new("$sort", pagination.PipelineSort),
+            };
+
+            List<BsonDocument> results = await context.Billings.Aggregate<BsonDocument>(pipeline).ToListAsync();
+            List<dynamic> list = results.Select(doc => BsonSerializer.Deserialize<dynamic>(doc)).ToList();
+            return new(list);
+        }
+        catch
+        {
+            return new(null, 500, "Falha ao buscar Faturamentos");
+        }
+    }    
     public async Task<int> GetCountDocumentsAsync(PaginationUtil<Billing> pagination)
     {
         List<BsonDocument> pipeline = new()

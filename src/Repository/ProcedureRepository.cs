@@ -18,7 +18,6 @@ namespace api_slim.src.Repository
         {
             List<BsonDocument> pipeline = new()
             {
-                new("$match", pagination.PipelineFilter),
                 new("$sort", pagination.PipelineSort),
                 new("$skip", pagination.Skip),
                 new("$limit", pagination.Limit),
@@ -38,6 +37,8 @@ namespace api_slim.src.Repository
                 }),
                 new BsonDocument("$unwind", "$_service_module"),
 
+                new("$match", pagination.PipelineFilter),
+                
                 new("$addFields", new BsonDocument
                 {
                     {"id", new BsonDocument("$toString", "$_id")},

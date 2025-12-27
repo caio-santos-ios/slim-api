@@ -1,12 +1,15 @@
 using System.Net.Http.Headers;
+using System.Text.RegularExpressions;
 using api_slim.src.Interfaces;
+using api_slim.src.Models;
 using api_slim.src.Models.Base;
 using api_slim.src.Shared.DTOs;
+using api_slim.src.Shared.Utils;
 using Newtonsoft.Json;
 
 namespace api_slim.src.Services
 {
-    public class TelemedicineService : ITelemedicineService
+    public class TelemedicineService(ICustomerRecipientRepository customerRepository) : ITelemedicineService
     {
         private readonly HttpClient client = new();
         private readonly string uri = "https://api.rapidoc.tech/tema/api";
@@ -37,12 +40,16 @@ namespace api_slim.src.Services
                     {
                         foreach (dynamic item in result.beneficiaries)
                         {
+                            string cpf = Regex.Replace(item.cpf.ToString(), @"(\d{3})(\d{3})(\d{3})(\d{2})", "$1.$2.$3-$4");
+                            ResponseApi<CustomerRecipient?> recipient = await customerRepository.GetByCPFAsync(cpf);
+                            
                             list.Add(new {
                                 id = item.uuid.ToString(),
                                 dateOfBirth = item.birthday.ToString(),
                                 cpf = item.cpf.ToString(),
                                 name = item.name.ToString(),
-                                status = item.isActive.ToString()
+                                status = item.isActive.ToString(),
+                                system = recipient.Data is not null
                             });                            
                         }
                     };

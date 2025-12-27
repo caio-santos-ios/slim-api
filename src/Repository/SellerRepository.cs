@@ -133,6 +133,38 @@ namespace api_slim.src.Repository
         }
     }
     
+    public async Task<ResponseApi<List<dynamic>>> GetSelectAsync(PaginationUtil<Seller> pagination)
+    {
+        try
+        {
+            List<BsonDocument> pipeline = new()
+            {
+                new("$match", pagination.PipelineFilter),
+                new("$sort", pagination.PipelineSort),
+                new("$addFields", new BsonDocument
+                {
+                }),
+                new("$project", new BsonDocument
+                {
+                    {"_id", 0}, 
+                    {"id", MongoUtil.ToString("$_id")},
+                    {"name", 1},                    
+                    {"createdAt", 1},                    
+                    {"deleted", 1},                    
+                }),
+                new("$sort", pagination.PipelineSort),
+            };
+
+            List<BsonDocument> results = await context.Sellers.Aggregate<BsonDocument>(pipeline).ToListAsync();
+            List<dynamic> list = results.Select(doc => BsonSerializer.Deserialize<dynamic>(doc)).ToList();
+            return new(list);
+        }
+        catch
+        {
+            return new(null, 500, "Falha ao buscar Vendedores");
+        }
+    }
+    
     public async Task<int> GetCountDocumentsAsync(PaginationUtil<Seller> pagination)
     {
         List<BsonDocument> pipeline = new()

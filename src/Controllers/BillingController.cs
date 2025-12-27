@@ -26,6 +26,14 @@ public class BillingController(IBillingService billingService) : ControllerBase
         ResponseApi<dynamic?> response = await billingService.GetByIdAggregateAsync(id);
         return StatusCode(response.StatusCode, new { response.Message, response.Result });
     }
+
+    [Authorize]
+    [HttpGet("select")]
+    public async Task<IActionResult> GetSelect()
+    {
+        ResponseApi<List<dynamic>> response = await billingService.GetSelectAsync(new(Request.Query));
+        return StatusCode(response.StatusCode, new { response.Message, response.Result });
+    }
     
     [Authorize]
     [HttpPost]
@@ -35,7 +43,7 @@ public class BillingController(IBillingService billingService) : ControllerBase
 
         ResponseApi<Billing?> response = await billingService.CreateAsync(billing);
 
-        return StatusCode(response.StatusCode, new { response.Message });
+        return StatusCode(response.StatusCode, new { response.Message, response.Result });
     }
     
     [Authorize]
@@ -46,7 +54,7 @@ public class BillingController(IBillingService billingService) : ControllerBase
 
         ResponseApi<Billing?> response = await billingService.UpdateAsync(billing);
 
-        return StatusCode(response.StatusCode, new { response.Message });
+        return StatusCode(response.StatusCode, new { response.Message, response.Result });
     }
     
     [Authorize]

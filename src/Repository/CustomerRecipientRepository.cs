@@ -41,7 +41,6 @@ namespace api_slim.src.Repository
                                     {
                                         new BsonDocument("$eq", new BsonArray
                                         {
-                                            // new BsonDocument("$toObjectId", "$parentId"),
                                             "$parentId",
                                             "$$profId"
                                         }),
@@ -100,7 +99,6 @@ namespace api_slim.src.Repository
                         {
                             new BsonDocument("$addFields", new BsonDocument
                             {
-                                // Criamos uma versão string do _id do plano para comparar
                                 { "idString", new BsonDocument("$toString", "$_id") }
                             }),
                             new BsonDocument("$match", new BsonDocument
@@ -135,7 +133,7 @@ namespace api_slim.src.Repository
                         }
                     },
                     {"genderDescription", new BsonDocument("$ifNull", new BsonArray { "$_gender.description", "" })},
-                    {"serviceModuleId", new BsonDocument("$ifNull", new BsonArray { "$_plan.serviceModuleId", "" })}
+                    {"serviceModuleId", new BsonDocument("$ifNull", new BsonArray { "$_plan.serviceModuleId", "" })},
                 }),
                 new("$project", new BsonDocument
                 {
@@ -224,6 +222,30 @@ namespace api_slim.src.Repository
         catch
         {
             return new(null, 500, "Falha ao buscar Items");
+        }
+    }
+    public async Task<ResponseApi<long?>> GetNextCodeAsync()
+    {
+        try
+        {
+            long code = await context.CustomerRecipients.Find(x => true).CountDocumentsAsync() + 1;
+            return new(code);
+        }
+        catch
+        {
+            return new(null, 500, "Falha ao buscar Items");
+        }
+    }
+    public async Task<ResponseApi<CustomerRecipient?>> GetByCPFAsync(string cpf)
+    {
+        try
+        {
+            CustomerRecipient? customerRecipient = await context.CustomerRecipients.Find(x => x.Cpf == cpf && !x.Deleted).FirstOrDefaultAsync();
+            return new(customerRecipient);
+        }
+        catch
+        {
+            return new(null, 500, "Falha ao buscar Beneficiário");
         }
     }
     public async Task<int> GetCountDocumentsAsync(PaginationUtil<CustomerRecipient> pagination)

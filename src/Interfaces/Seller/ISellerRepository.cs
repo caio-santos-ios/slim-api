@@ -9,6 +9,7 @@ public interface ISellerRepository
     Task<ResponseApi<List<dynamic>>> GetAllAsync(PaginationUtil<Seller> pagination);
     Task<ResponseApi<dynamic?>> GetByIdAggregateAsync(string id);
     Task<ResponseApi<Seller?>> GetByIdAsync(string id);
+    Task<ResponseApi<List<dynamic>>> GetSelectAsync(PaginationUtil<Seller> pagination);
     Task<int> GetCountDocumentsAsync(PaginationUtil<Seller> pagination);
     Task<ResponseApi<Seller?>> CreateAsync(Seller seller);
     Task<ResponseApi<Seller?>> UpdateAsync(Seller seller);

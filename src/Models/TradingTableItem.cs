@@ -23,5 +23,8 @@ namespace api_slim.src.Models
 
         [BsonElement("discount")]
         public decimal Discount { get; set; }
+        
+        [BsonElement("discountPercentage")]
+        public decimal DiscountPercentage { get; set; }
     }
 }

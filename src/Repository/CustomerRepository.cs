@@ -24,9 +24,24 @@ namespace api_slim.src.Repository
                 {
                     {"id", new BsonDocument("$toString", "$_id")},
                 }),
+                
+                MongoUtil.Lookup("customer_recipients", ["$id"], ["$contractorId"], "_recipient", [["deleted", false]], 1),
+                MongoUtil.Lookup("customer_recipients", ["$id"], ["$contractorId"], "_recipient", [["deleted", false]], 1),
+                new("$addFields", new BsonDocument
+                {
+                    {"planId", MongoUtil.First("_recipient.planId")},
+                }),
+                new("$addFields", new BsonDocument
+                {
+                    {"recipientName", MongoUtil.First("_recipient.name")},
+                    {"recipientCode", MongoUtil.First("_recipient.code")},
+                    {"recipientCPF", MongoUtil.First("_recipient.cpf")},
+                }),
+                
                 new("$project", new BsonDocument
                 {
                     {"_id", 0},                     
+                    {"_recipient", 0},                     
                 }),
                 new("$sort", pagination.PipelineSort),
                 new("$skip", pagination.Skip),

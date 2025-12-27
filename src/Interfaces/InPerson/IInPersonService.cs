@@ -10,6 +10,7 @@ namespace api_slim.src.Interfaces
         Task<ResponseApi<dynamic?>> GetByIdAggregateAsync(string id);
         Task<ResponseApi<InPerson?>> CreateAsync(CreateInPersonDTO user);
         Task<ResponseApi<InPerson?>> UpdateAsync(UpdateInPersonDTO request);
+        Task<ResponseApi<InPerson?>> UpdateStatusAsync(UpdateInPersonStatusDTO request);
         Task<ResponseApi<InPerson>> DeleteAsync(string id);
     }
 }

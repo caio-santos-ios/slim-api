@@ -34,6 +34,9 @@ namespace api_slim.src.Models
         [BsonElement("serviceModuleId")]
         public string ServiceModuleId { get; set; } = string.Empty;
         
+        [BsonElement("billingId")]
+        public string BillingId { get; set; } = string.Empty;
+        
         [BsonElement("effectiveDate")]
         public DateTime EffectiveDate { get; set; }
         
