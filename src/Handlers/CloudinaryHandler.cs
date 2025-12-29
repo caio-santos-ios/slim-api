@@ -9,16 +9,14 @@ namespace api_slim.src.Handlers
 
         public async Task<string> UploadAttachment(string parent, IFormFile attachment)
         {
-            string webRoot = env.WebRootPath;
-
-            if (string.IsNullOrEmpty(webRoot))
-            {
-                webRoot = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot");
-            };
+            string webRoot = Path.Combine(env.ContentRootPath, "wwwroot");
 
             string uploadPath = Path.Combine(webRoot, "uploads", parent);
 
-            if (!Directory.Exists(uploadPath)) Directory.CreateDirectory(uploadPath);
+            if (!Directory.Exists(uploadPath)) 
+            {
+                Directory.CreateDirectory(uploadPath);
+            }
 
             string fileName = $"{Guid.NewGuid()}{Path.GetExtension(attachment.FileName)}";
             string filePath = Path.Combine(uploadPath, fileName);
@@ -28,6 +26,7 @@ namespace api_slim.src.Handlers
                 await attachment.CopyToAsync(stream);
             }
 
+            // Retorna o caminho relativo para salvar no banco de dados
             return Path.Combine("uploads", parent, fileName);
         }
         
