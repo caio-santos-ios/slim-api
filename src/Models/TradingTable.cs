@@ -12,6 +12,9 @@ namespace api_slim.src.Models
         
         [BsonElement("name")]
         public string Name {get;set;} = string.Empty; 
+        
+        [BsonElement("accreditedNetworkId")]
+        public string AccreditedNetworkId {get;set;} = string.Empty; 
 
         [BsonElement("items")]
         public List<TradingTableItem> Items {get;set;} = []; 
