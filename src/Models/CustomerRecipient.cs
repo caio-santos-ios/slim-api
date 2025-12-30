@@ -51,5 +51,17 @@ namespace api_slim.src.Models
        
         [BsonElement("bond")]
         public string Bond { get; set; } = string.Empty;
+        
+        [BsonElement("subTotal")]
+        public decimal SubTotal { get; set; }
+
+        [BsonElement("total")]
+        public decimal Total { get; set; }
+
+        [BsonElement("discount")]
+        public decimal Discount { get; set; }
+        
+        [BsonElement("discountPercentage")]
+        public decimal DiscountPercentage { get; set; }
     } 
 }

@@ -26,7 +26,6 @@ namespace api_slim.src.Handlers
                 await attachment.CopyToAsync(stream);
             }
 
-            // Retorna o caminho relativo para salvar no banco de dados
             return Path.Combine("uploads", parent, fileName);
         }
         

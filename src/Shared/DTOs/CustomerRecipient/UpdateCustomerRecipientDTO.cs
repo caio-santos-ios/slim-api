@@ -19,5 +19,9 @@ namespace api_slim.src.Shared.DTOs
                 public string Notes { get; set; } = string.Empty;
                 public string ContractorId { get; set; } = string.Empty;
                 public string Bond { get; set; } = string.Empty;
+                public decimal SubTotal { get; set; }
+                public decimal Total { get; set; }
+                public decimal Discount { get; set; }
+                public decimal DiscountPercentage { get; set; }
         }
 }

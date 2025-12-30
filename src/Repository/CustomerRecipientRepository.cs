@@ -27,113 +27,72 @@ namespace api_slim.src.Repository
                     {"id", new BsonDocument("$toString", "$_id")},
                 }),
 
-                new BsonDocument("$lookup", new BsonDocument
-                {
-                    { "from", "addresses" },
+                // new BsonDocument("$lookup", new BsonDocument
+                // {
+                //     { "from", "addresses" },
 
-                    { "let", new BsonDocument("profId", "$id") },
+                //     { "let", new BsonDocument("profId", "$id") },
 
-                    { "pipeline", new BsonArray
-                        {
-                            new BsonDocument("$match", new BsonDocument
-                            {
-                                { "$expr", new BsonDocument("$and", new BsonArray
-                                    {
-                                        new BsonDocument("$eq", new BsonArray
-                                        {
-                                            "$parentId",
-                                            "$$profId"
-                                        }),
+                //     { "pipeline", new BsonArray
+                //         {
+                //             new BsonDocument("$match", new BsonDocument
+                //             {
+                //                 { "$expr", new BsonDocument("$and", new BsonArray
+                //                     {
+                //                         new BsonDocument("$eq", new BsonArray
+                //                         {
+                //                             "$parentId",
+                //                             "$$profId"
+                //                         }),
 
-                                        new BsonDocument("$eq", new BsonArray
-                                        {
-                                            "$parent",
-                                            "customer-recipient"
-                                        })
-                                    })
-                                }
-                            })
-                        }
-                    },
+                //                         new BsonDocument("$eq", new BsonArray
+                //                         {
+                //                             "$parent",
+                //                             "customer-recipient"
+                //                         })
+                //                     })
+                //                 }
+                //             })
+                //         }
+                //     },
 
-                    { "as", "_address" }
-                }),
+                //     { "as", "_address" }
+                // }),
 
-                new BsonDocument("$unwind", new BsonDocument
-                {
-                    { "path", "$_address" },
-                    { "preserveNullAndEmptyArrays", true }
-                }),
+                // new BsonDocument("$unwind", new BsonDocument
+                // {
+                //     { "path", "$_address" },
+                //     { "preserveNullAndEmptyArrays", true }
+                // }),
 
-                new BsonDocument("$lookup", new BsonDocument
-                {
-                    { "from", "generic_tables" }, 
-                    { "let", new BsonDocument("gender", "$gender") },
-                    { "pipeline", new BsonArray
-                        {
-                            new BsonDocument("$match", new BsonDocument
-                            {
-                                { "$expr", new BsonDocument("$and", new BsonArray
-                                    {
-                                        new BsonDocument("$eq", new BsonArray { "$code", "$$gender" }),
-                                        new BsonDocument("$eq", new BsonArray { "$table", "genero" })
-                                    })
-                                }
-                            })
-                        }
-                    },
-                    { "as", "_gender" } 
-                }),
-
-                new BsonDocument("$unwind", new BsonDocument
-                {
-                    { "path", "$_gender" },
-                    { "preserveNullAndEmptyArrays", true }
-                }),
-
-                new BsonDocument("$lookup", new BsonDocument
-                {
-                    { "from", "plans" },
-                    { "let", new BsonDocument("registrationId", "$planId") },
-                    { "pipeline", new BsonArray
-                        {
-                            new BsonDocument("$addFields", new BsonDocument
-                            {
-                                { "idString", new BsonDocument("$toString", "$_id") }
-                            }),
-                            new BsonDocument("$match", new BsonDocument
-                            {
-                                { "$expr", new BsonDocument("$eq", new BsonArray { "$idString", "$$registrationId" }) }
-                            })
-                        }
-                    },
-                    { "as", "_plan" }
-                }),
-
-                new BsonDocument("$unwind", new BsonDocument
-                {
-                    { "path", "$_plan" },
-                    { "preserveNullAndEmptyArrays", true }
-                }),
+                MongoUtil.Lookup("addresses", ["$id"], ["$parentId"], "_address", [["deleted", false]], 1),
+                MongoUtil.Lookup("customers", ["$contractorId"], ["$_id"], "_customer", [["deleted", false]], 1),
+                MongoUtil.Lookup("generic_tables", ["$gender"], ["$code"], "_gender", [["deleted", false], ["table", "genero"]], 1),
 
                 new("$addFields", new BsonDocument
                 {
+                    {"addressId", MongoUtil.First("_address._id")}
+                }),
+                new("$addFields", new BsonDocument
+                {
+                    {"type", MongoUtil.First("_customer.type")},
+                    {"typePlan", MongoUtil.First("_customer.typePlan")},
+                    {"effectiveDate", MongoUtil.First("_customer.effectiveDate")},
+                    {"genderDescription", MongoUtil.First("_gender.description")},
                     {"address", new BsonDocument
                         {
-                            {"id", new BsonDocument("$ifNull", new BsonArray { new BsonDocument("$toString", "$_address._id"), "" })},
-                            {"street", new BsonDocument("$ifNull", new BsonArray { "$_address.street", "" })},
-                            {"number", new BsonDocument("$ifNull", new BsonArray {"$_address.number" , "" })},
-                            {"complement", new BsonDocument("$ifNull", new BsonArray {"$_address.complement" , "" })},
-                            {"neighborhood", new BsonDocument("$ifNull", new BsonArray {"$_address.neighborhood" , "" })},
-                            {"city", new BsonDocument("$ifNull", new BsonArray {"$_address.city" , "" })},
-                            {"state", new BsonDocument("$ifNull", new BsonArray {"$_address.state" , "" })},
-                            {"zipCode", new BsonDocument("$ifNull", new BsonArray {"$_address.zipCode" , "" })},
-                            {"parent", new BsonDocument("$ifNull", new BsonArray {"$_address.parent" , "" })},
-                            {"parentId", new BsonDocument("$ifNull", new BsonArray {"$_address.parentId" , "" })},
+                            {"id", MongoUtil.ToString("$addressId")},
+                            {"street",  MongoUtil.First("_address.street")},
+                            {"number", MongoUtil.First("_address.number") },
+                            {"complement", MongoUtil.First("_address.complement") },
+                            {"neighborhood", MongoUtil.First("_address.neighborhood") },
+                            {"city", MongoUtil.First("_address.city") },
+                            {"state", MongoUtil.First("_address.state") },
+                            {"zipCode", MongoUtil.First("_address.zipCode") },
+                            {"parent", MongoUtil.First("_address.parent") },
+                            {"parentId", MongoUtil.First("_address.parentId") },
                         }
-                    },
-                    {"genderDescription", new BsonDocument("$ifNull", new BsonArray { "$_gender.description", "" })},
-                    {"serviceModuleId", new BsonDocument("$ifNull", new BsonArray { "$_plan.serviceModuleId", "" })},
+                    }
                 }),
                 new("$project", new BsonDocument
                 {
@@ -143,8 +102,7 @@ namespace api_slim.src.Repository
                 }),
                 new("$sort", pagination.PipelineSort),
                 new("$skip", pagination.Skip),
-                new("$limit", pagination.Limit),
-
+                new("$limit", pagination.Limit)
             };
 
             List<BsonDocument> results = await context.CustomerRecipients.Aggregate<BsonDocument>(pipeline).ToListAsync();
