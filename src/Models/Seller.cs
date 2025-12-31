@@ -33,5 +33,8 @@ namespace api_slim.src.Models
         
         [BsonElement("parentId")]
         public string ParentId { get; set; } = string.Empty;
+        
+        [BsonElement("effectiveDate")]
+        public DateTime? EffectiveDate { get; set; }
     }
 }

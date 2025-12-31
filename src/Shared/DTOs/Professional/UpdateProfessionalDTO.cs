@@ -3,9 +3,9 @@ using api_slim.src.Models;
 namespace api_slim.src.Shared.DTOs
 {
     public class UpdateProfessionalDTO
-{
-public string Id { get; set; } = string.Empty;
-        
+    {
+        public string Id { get; set; } = string.Empty;
+            
         public string Name { get; set; } = string.Empty;
 
         public string Email { get; set; } = string.Empty;
@@ -19,9 +19,10 @@ public string Id { get; set; } = string.Empty;
         public string Type { get; set; } = string.Empty;
         
         public string Specialty { get; set; } = string.Empty;
-       
+        
         public string Registration { get; set; } = string.Empty;
-     
+        
         public string Number { get; set; } = string.Empty;
-}
+        public DateTime? EffectiveDate { get; set; }
+    }
 }

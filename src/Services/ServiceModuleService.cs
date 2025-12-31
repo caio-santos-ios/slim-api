@@ -1,3 +1,4 @@
+using System.Net.Http.Headers;
 using api_slim.src.Handlers;
 using api_slim.src.Interfaces;
 using api_slim.src.Models;
@@ -5,6 +6,7 @@ using api_slim.src.Models.Base;
 using api_slim.src.Shared.DTOs;
 using api_slim.src.Shared.Utils;
 using AutoMapper;
+using Newtonsoft.Json;
 
 namespace api_slim.src.Services
 {
@@ -46,6 +48,45 @@ namespace api_slim.src.Services
             PaginationUtil<ServiceModule> pagination = new(request.QueryParams);
             ResponseApi<List<dynamic>> serviceModules = await serviceModuleRepository.GetAllAsync(pagination);
             return new(serviceModules.Data);
+        }
+        catch
+        {
+            return new(null, 500, "Ocorreu um erro inesperado. Por favor, tente novamente mais tarde.");
+        }
+    }
+    public async Task<ResponseApi<ServiceModule?>> GetByNameRapiDocAsync(string name)
+    {
+        try
+        {
+            HttpClient client = new();
+            string uri = Environment.GetEnvironmentVariable("URI_RAPIDOC") ?? "";
+            string clientId = Environment.GetEnvironmentVariable("CLIENT_ID_RAPIDOC") ?? "";
+            string token = Environment.GetEnvironmentVariable("TOKEN_RAPIDOC") ?? "";
+
+            var request = new HttpRequestMessage(HttpMethod.Get, $"{uri}/plans");
+            request.Headers.Add("clientId", clientId);
+            request.Headers.Add("Authorization", $"Bearer {token}");
+            var content = new StringContent(string.Empty);
+            content.Headers.ContentType = new MediaTypeHeaderValue("application/vnd.rapidoc.tema-v2+json");
+            request.Content = content;
+            var response = await client.SendAsync(request);
+            response.EnsureSuccessStatusCode();
+            string jsonResponse = await response.Content.ReadAsStringAsync();
+
+            dynamic? result = JsonConvert.DeserializeObject(jsonResponse);
+
+            ServiceModule serviceModule = new();
+            if(result is not null) 
+            {
+                foreach (dynamic item in result)
+                {         
+                    if(name.ToUpper().Equals(item.plan.name.ToString().ToUpper()))
+                    {
+                        serviceModule.RapiDocId = item.plan.uuid.ToString();                        
+                    }                
+                }
+            }
+            return new(serviceModule);
         }
         catch
         {

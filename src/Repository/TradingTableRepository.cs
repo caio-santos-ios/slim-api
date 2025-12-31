@@ -111,6 +111,38 @@ namespace api_slim.src.Repository
             return new(null, 500, "Ocorreu um erro inesperado. Por favor, tente novamente mais tarde.");
         }
     }
+    public async Task<ResponseApi<dynamic?>> GetByaccreditedNetworkIdAsync(string accreditedNetworkId)
+    {
+        try
+        {
+            List<BsonDocument> pipeline = new()
+            {
+                new("$match", new BsonDocument {
+                    {"deleted", false},
+                    {"accreditedNetworkId", accreditedNetworkId}
+                }),
+                new("$project", new BsonDocument
+                {
+                    {"_id", 0}, 
+                    {"id", new BsonDocument("$toString", "$_id")},
+                    {"name", 1},
+                    {"createdAt", 1},
+                    {"items", 1}
+                }),
+                new("$sort", new BsonDocument {
+                    { "createdAt", -1}
+                }),
+            };
+
+            BsonDocument? response = await context.TradingTables.Aggregate<BsonDocument>(pipeline).FirstOrDefaultAsync();
+            dynamic? result = response is null ? null : BsonSerializer.Deserialize<dynamic>(response);
+            return result is null ? new(null, 404, "Tabela de Negociação não encontrado") : new(result);
+        }
+        catch
+        {
+            return new(null, 500, "Ocorreu um erro inesperado. Por favor, tente novamente mais tarde.");
+        }
+    }
     public async Task<int> GetCountDocumentsAsync(PaginationUtil<TradingTable> pagination)
     {
         List<BsonDocument> pipeline = new()

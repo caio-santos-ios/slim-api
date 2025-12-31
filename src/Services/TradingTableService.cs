@@ -23,8 +23,7 @@ namespace api_slim.src.Services
         {
             return new(null, 500, "Ocorreu um erro inesperado. Por favor, tente novamente mais tarde.");
         }
-    }
-    
+    }  
     public async Task<ResponseApi<dynamic?>> GetByIdAggregateAsync(string id)
     {
         try
@@ -44,6 +43,18 @@ namespace api_slim.src.Services
         {
             PaginationUtil<TradingTable> pagination = new(request.QueryParams);
             ResponseApi<List<dynamic>> tradingTables = await tradingTableRepository.GetSelectAsync(pagination);
+            return new(tradingTables.Data);
+        }
+        catch
+        {
+            return new(null, 500, "Ocorreu um erro inesperado. Por favor, tente novamente mais tarde.");
+        }
+    }
+    public async Task<ResponseApi<dynamic?>> GetByaccreditedNetworkIdAsync(string accreditedNetworkId)
+    {
+        try
+        {
+            ResponseApi<dynamic?> tradingTables = await tradingTableRepository.GetByaccreditedNetworkIdAsync(accreditedNetworkId);
             return new(tradingTables.Data);
         }
         catch

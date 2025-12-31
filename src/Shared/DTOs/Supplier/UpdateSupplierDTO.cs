@@ -22,5 +22,6 @@ namespace api_slim.src.Shared.DTOs
         public string MunicipalRegistration { get; set; } = string.Empty;
 
         public string Notes { get; set; } = string.Empty;
+        public DateTime? EffectiveDate { get; set; }
     }
 }

@@ -22,8 +22,7 @@ namespace api_slim.src.Shared.DTOs
                 public Contact Contact { get; set; } = new();
                 public Seller Seller { get; set; } = new();
                 public CreateResponsibleDTO Responsible { get; set; } = new();
-                public RepresentativeBank Bank { get; set; } = new();
-        
+                public RepresentativeBank Bank { get; set; } = new();        
         }
         public class CreateResponsibleDTO
         {

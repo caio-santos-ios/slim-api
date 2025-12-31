@@ -50,6 +50,9 @@ namespace api_slim.src.Models
         
         [BsonElement("modules")]
         public List<Module> Modules {get;set;} = [];
+        
+        [BsonElement("effectiveDate")]
+        public DateTime? EffectiveDate { get; set; }
     }
 
     public class Module 

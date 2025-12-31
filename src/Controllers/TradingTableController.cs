@@ -36,6 +36,14 @@ namespace api_slim.src.Controllers
         }
                 
         [Authorize]
+        [HttpGet("accredited-network/{accreditedNetworkId}")]
+        public async Task<IActionResult> GetByaccreditedNetworkIdAsync(string accreditedNetworkId)
+        {
+            ResponseApi<dynamic?> response = await service.GetByaccreditedNetworkIdAsync(accreditedNetworkId);
+            return StatusCode(response.StatusCode, new { response.Message, response.Result });
+        }
+                
+        [Authorize]
         [HttpPost]
         public async Task<IActionResult> Create([FromBody] CreateTradingTableDTO address)
         {

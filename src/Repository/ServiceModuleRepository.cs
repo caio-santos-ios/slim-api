@@ -84,6 +84,18 @@ namespace api_slim.src.Repository
             return new(null, 500, "Falha ao buscar Módulo de Serviço");
         }
     }
+    public async Task<ResponseApi<ServiceModule?>> GetByPlanAsync(string planId)
+    {
+        try
+        {
+            ServiceModule? serviceModule = await context.ServiceModules.Find(x => x.PlanId == planId && !x.Deleted).FirstOrDefaultAsync();
+            return new(serviceModule);
+        }
+        catch
+        {
+            return new(null, 500, "Falha ao buscar Módulo de Serviço");
+        }
+    }
     
     public async Task<ResponseApi<List<ServiceModule>>> GetByPlanIdAsync(string planId)
     {
@@ -123,6 +135,18 @@ namespace api_slim.src.Repository
         catch
         {
             return new(null, 500, "Falha ao buscar Items");
+        }
+    }
+    public async Task<ResponseApi<ServiceModule?>> GetByNameAsync(string name)
+    {
+        try
+        {
+            ServiceModule? serviceModule = await context.ServiceModules.Find(x => x.Name.ToUpper().Equals(name.ToUpper()) && !x.Deleted).FirstOrDefaultAsync();
+            return new(serviceModule);
+        }
+        catch
+        {
+            return new(null, 500, "Falha ao buscar Módulo de Serviço");
         }
     }
     public async Task<int> GetCountDocumentsAsync(PaginationUtil<ServiceModule> pagination)

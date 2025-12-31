@@ -10,6 +10,7 @@ namespace api_slim.src.Interfaces
         Task<ResponseApi<dynamic?>> GetByIdAggregateAsync(string id);
         Task<ResponseApi<TradingTable?>> GetByIdAsync(string id);
         Task<ResponseApi<List<dynamic>>> GetSelectAsync(PaginationUtil<TradingTable> pagination);
+        Task<ResponseApi<dynamic?>> GetByaccreditedNetworkIdAsync(string accreditedNetworkId);
         Task<int> GetCountDocumentsAsync(PaginationUtil<TradingTable> pagination);
         Task<ResponseApi<TradingTable?>> CreateAsync(TradingTable user);
         Task<ResponseApi<TradingTable?>> UpdateAsync(TradingTable request);

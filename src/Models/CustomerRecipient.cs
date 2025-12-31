@@ -63,5 +63,7 @@ namespace api_slim.src.Models
         
         [BsonElement("discountPercentage")]
         public decimal DiscountPercentage { get; set; }
+        [BsonElement("rapidocId")]
+        public string RapidocId { get; set; } = string.Empty;
     } 
 }

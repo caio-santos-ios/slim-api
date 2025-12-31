@@ -18,7 +18,6 @@ namespace api_slim.src.Repository
         {
             List<BsonDocument> pipeline = new()
             {
-                new("$match", pagination.PipelineFilter),
                 new("$sort", pagination.PipelineSort),  
 
                 
@@ -27,46 +26,11 @@ namespace api_slim.src.Repository
                     {"id", new BsonDocument("$toString", "$_id")},
                 }),
 
-                // new BsonDocument("$lookup", new BsonDocument
-                // {
-                //     { "from", "addresses" },
-
-                //     { "let", new BsonDocument("profId", "$id") },
-
-                //     { "pipeline", new BsonArray
-                //         {
-                //             new BsonDocument("$match", new BsonDocument
-                //             {
-                //                 { "$expr", new BsonDocument("$and", new BsonArray
-                //                     {
-                //                         new BsonDocument("$eq", new BsonArray
-                //                         {
-                //                             "$parentId",
-                //                             "$$profId"
-                //                         }),
-
-                //                         new BsonDocument("$eq", new BsonArray
-                //                         {
-                //                             "$parent",
-                //                             "customer-recipient"
-                //                         })
-                //                     })
-                //                 }
-                //             })
-                //         }
-                //     },
-
-                //     { "as", "_address" }
-                // }),
-
-                // new BsonDocument("$unwind", new BsonDocument
-                // {
-                //     { "path", "$_address" },
-                //     { "preserveNullAndEmptyArrays", true }
-                // }),
-
                 MongoUtil.Lookup("addresses", ["$id"], ["$parentId"], "_address", [["deleted", false]], 1),
                 MongoUtil.Lookup("customers", ["$contractorId"], ["$_id"], "_customer", [["deleted", false]], 1),
+                
+                new("$match", pagination.PipelineFilter),
+                
                 MongoUtil.Lookup("generic_tables", ["$gender"], ["$code"], "_gender", [["deleted", false], ["table", "genero"]], 1),
 
                 new("$addFields", new BsonDocument
@@ -168,7 +132,8 @@ namespace api_slim.src.Repository
                     {"_id", 0}, 
                     {"id", new BsonDocument("$toString", "$_id")},
                     {"name", 1},
-                    {"createdAt", 1}
+                    {"createdAt", 1},
+                    {"rapidocId", 1}
                 }),
                 new("$sort", pagination.PipelineSort),
             };

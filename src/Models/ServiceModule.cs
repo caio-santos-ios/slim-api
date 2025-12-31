@@ -33,5 +33,8 @@ namespace api_slim.src.Models
        
         [BsonElement("type")]
         public string Type { get; set; } = string.Empty;
+       
+        [BsonElement("rapiDocId")]
+        public string RapiDocId { get; set; } = string.Empty;
     }
 }

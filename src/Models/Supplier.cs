@@ -36,5 +36,8 @@ namespace api_slim.src.Models
 
         [BsonElement("notes")]
         public string Notes { get; set; } = string.Empty;
+        
+        [BsonElement("effectiveDate")]
+        public DateTime? EffectiveDate { get; set; }
     }
 }

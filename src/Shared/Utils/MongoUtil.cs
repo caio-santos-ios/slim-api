@@ -75,6 +75,8 @@ namespace api_slim.src.Shared.Utils
                 : new BsonDocument($"{prop}", new BsonDocument("$first", $"${field}"));
         }
 
-
+        public static BsonDocument ValidateNull(string field, dynamic valueIfNull){
+            return new BsonDocument("$ifNull", new BsonArray{$"${field}", valueIfNull});
+        }
     }
 }
