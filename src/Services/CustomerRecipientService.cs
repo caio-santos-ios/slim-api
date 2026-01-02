@@ -94,7 +94,8 @@ namespace api_slim.src.Services
                     zipCode = new string(request.Address.ZipCode.Where(char.IsDigit).ToArray()),
                     address = $"{request.Address.Street}, {request.Address.Number}",
                     city = request.Address.City,
-                    state = ""
+                    state = "",
+                    serviceType = "GSP"
                 }
             };
 

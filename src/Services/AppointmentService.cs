@@ -6,7 +6,7 @@ using Newtonsoft.Json;
 
 namespace api_slim.src.Services
 {
-    public class AppointmentService : IAppointmentService
+    public class AppointmentService(IHistoricService historicService) : IAppointmentService
     {
         private readonly HttpClient client = new();
         private readonly string uri = Environment.GetEnvironmentVariable("URI_RAPIDOC") ?? "";
@@ -196,6 +196,12 @@ namespace api_slim.src.Services
                 string jsonResponse = await responseRapidoc.Content.ReadAsStringAsync();
                 dynamic? result = Newtonsoft.Json.JsonConvert.DeserializeObject(jsonResponse);
 
+                await historicService.CreateAsync(new ()
+                {
+                    Collection = "appointment",
+                    Description = "Agendamento",
+                });
+
                 return new(null, 201, "Agendamento feito com sucesso");
             }
             catch
@@ -224,6 +230,12 @@ namespace api_slim.src.Services
                     string msg = resultError!.message.ToString();
                     return new(null, 400, msg);
                 };
+
+                await historicService.CreateAsync(new ()
+                {
+                    Collection = "appointment",
+                    Description = "Agendamento Cancelado",
+                });
 
                 return new(null, 204, "Cancelado com sucesso");
             }

@@ -82,6 +82,8 @@ namespace api_slim.src.Configuration
             #region SERVICE
             CreateMap<CreateInPersonDTO, InPerson>().ReverseMap();
             CreateMap<UpdateInPersonDTO, InPerson>().ReverseMap();
+            CreateMap<CreateHistoricDTO, Historic>().ReverseMap();
+            CreateMap<UpdateHistoricDTO, Historic>().ReverseMap();
             #endregion
         }
     }

@@ -7,7 +7,7 @@ using Newtonsoft.Json;
 
 namespace api_slim.src.Services
 {
-    public class ForwardingService : IForwardingService
+    public class ForwardingService(IHistoricService historicService) : IForwardingService
     {
         private readonly HttpClient client = new();
         private readonly string uri = Environment.GetEnvironmentVariable("URI_RAPIDOC") ?? "";
@@ -206,6 +206,11 @@ namespace api_slim.src.Services
                 responseRapidoc.EnsureSuccessStatusCode();
                 string jsonResponse = await responseRapidoc.Content.ReadAsStringAsync();
                 dynamic? result = Newtonsoft.Json.JsonConvert.DeserializeObject(jsonResponse);
+                await historicService.CreateAsync(new ()
+                {
+                    Collection = "forwarding",
+                    Description = "Encaminhamento Agendado"
+                });
 
                 return new(null, 201, "Agendamento feito com sucesso");
             }
@@ -236,6 +241,12 @@ namespace api_slim.src.Services
                     return new(null, 400, msg);
                 };
                 response.EnsureSuccessStatusCode();
+
+                await historicService.CreateAsync(new ()
+                {
+                    Collection = "forwarding",
+                    Description = "Encaminhamento Cancelado"
+                });
 
                 return new(null, 204, "Cancelado com sucesso");
             }

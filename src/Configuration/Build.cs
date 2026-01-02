@@ -111,6 +111,8 @@ namespace api_slim.src.Configuration
             // SERVICE
             builder.Services.AddTransient<IInPersonService, InPersonService>();
             builder.Services.AddTransient<IInPersonRepository, InPersonRepository>();
+            builder.Services.AddTransient<IHistoricService, HistoricService>();
+            builder.Services.AddTransient<IHistoricRepository, HistoricRepository>();
             builder.Services.AddTransient<ITelemedicineService, TelemedicineService>();
             builder.Services.AddTransient<IForwardingService, ForwardingService>();
             builder.Services.AddTransient<IAppointmentService, AppointmentService>();

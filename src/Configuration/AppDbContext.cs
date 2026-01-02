@@ -127,6 +127,10 @@ namespace api_slim.src.Configuration
         {
             get { return Database.GetCollection<InPerson>("in_person"); }
         }
+        public IMongoCollection<Historic> Historics
+        {
+            get { return Database.GetCollection<Historic>("historics"); }
+        }
         #endregion
     }
 }
